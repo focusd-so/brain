@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"connectrpc.com/connect"
+	"github.com/focusd-so/brain/gen/brain/v1/brainv1connect"
 	"github.com/o1egl/paseto"
 )
 
@@ -130,7 +131,7 @@ func NewAuthInterceptor() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
 			// 1. Skip Auth for specific public endpoints (like Handshake)
-			if strings.HasSuffix(req.Spec().Procedure, "DeviceHandshake") {
+			if req.Spec().Procedure == brainv1connect.BrainServiceDeviceHandshakeProcedure {
 				return next(ctx, req)
 			}
 
