@@ -36,11 +36,20 @@ const (
 	// BrainServiceDeviceHandshakeProcedure is the fully-qualified name of the BrainService's
 	// DeviceHandshake RPC.
 	BrainServiceDeviceHandshakeProcedure = "/brain.v1.BrainService/DeviceHandshake"
+	// BrainServiceClassifyApplicationProcedure is the fully-qualified name of the BrainService's
+	// ClassifyApplication RPC.
+	BrainServiceClassifyApplicationProcedure = "/brain.v1.BrainService/ClassifyApplication"
+	// BrainServiceClassifyWebsiteProcedure is the fully-qualified name of the BrainService's
+	// ClassifyWebsite RPC.
+	BrainServiceClassifyWebsiteProcedure = "/brain.v1.BrainService/ClassifyWebsite"
 )
 
 // BrainServiceClient is a client for the brain.v1.BrainService service.
 type BrainServiceClient interface {
 	DeviceHandshake(context.Context, *connect.Request[v1.DeviceHandshakeRequest]) (*connect.Response[v1.DeviceHandshakeResponse], error)
+	// classification
+	ClassifyApplication(context.Context, *connect.Request[v1.ClassifyApplicationRequest]) (*connect.Response[v1.ClassifyApplicationResponse], error)
+	ClassifyWebsite(context.Context, *connect.Request[v1.ClassifyWebsiteRequest]) (*connect.Response[v1.ClassifyWebsiteResponse], error)
 }
 
 // NewBrainServiceClient constructs a client for the brain.v1.BrainService service. By default, it
@@ -60,12 +69,26 @@ func NewBrainServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(brainServiceMethods.ByName("DeviceHandshake")),
 			connect.WithClientOptions(opts...),
 		),
+		classifyApplication: connect.NewClient[v1.ClassifyApplicationRequest, v1.ClassifyApplicationResponse](
+			httpClient,
+			baseURL+BrainServiceClassifyApplicationProcedure,
+			connect.WithSchema(brainServiceMethods.ByName("ClassifyApplication")),
+			connect.WithClientOptions(opts...),
+		),
+		classifyWebsite: connect.NewClient[v1.ClassifyWebsiteRequest, v1.ClassifyWebsiteResponse](
+			httpClient,
+			baseURL+BrainServiceClassifyWebsiteProcedure,
+			connect.WithSchema(brainServiceMethods.ByName("ClassifyWebsite")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // brainServiceClient implements BrainServiceClient.
 type brainServiceClient struct {
-	deviceHandshake *connect.Client[v1.DeviceHandshakeRequest, v1.DeviceHandshakeResponse]
+	deviceHandshake     *connect.Client[v1.DeviceHandshakeRequest, v1.DeviceHandshakeResponse]
+	classifyApplication *connect.Client[v1.ClassifyApplicationRequest, v1.ClassifyApplicationResponse]
+	classifyWebsite     *connect.Client[v1.ClassifyWebsiteRequest, v1.ClassifyWebsiteResponse]
 }
 
 // DeviceHandshake calls brain.v1.BrainService.DeviceHandshake.
@@ -73,9 +96,22 @@ func (c *brainServiceClient) DeviceHandshake(ctx context.Context, req *connect.R
 	return c.deviceHandshake.CallUnary(ctx, req)
 }
 
+// ClassifyApplication calls brain.v1.BrainService.ClassifyApplication.
+func (c *brainServiceClient) ClassifyApplication(ctx context.Context, req *connect.Request[v1.ClassifyApplicationRequest]) (*connect.Response[v1.ClassifyApplicationResponse], error) {
+	return c.classifyApplication.CallUnary(ctx, req)
+}
+
+// ClassifyWebsite calls brain.v1.BrainService.ClassifyWebsite.
+func (c *brainServiceClient) ClassifyWebsite(ctx context.Context, req *connect.Request[v1.ClassifyWebsiteRequest]) (*connect.Response[v1.ClassifyWebsiteResponse], error) {
+	return c.classifyWebsite.CallUnary(ctx, req)
+}
+
 // BrainServiceHandler is an implementation of the brain.v1.BrainService service.
 type BrainServiceHandler interface {
 	DeviceHandshake(context.Context, *connect.Request[v1.DeviceHandshakeRequest]) (*connect.Response[v1.DeviceHandshakeResponse], error)
+	// classification
+	ClassifyApplication(context.Context, *connect.Request[v1.ClassifyApplicationRequest]) (*connect.Response[v1.ClassifyApplicationResponse], error)
+	ClassifyWebsite(context.Context, *connect.Request[v1.ClassifyWebsiteRequest]) (*connect.Response[v1.ClassifyWebsiteResponse], error)
 }
 
 // NewBrainServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -91,10 +127,26 @@ func NewBrainServiceHandler(svc BrainServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(brainServiceMethods.ByName("DeviceHandshake")),
 		connect.WithHandlerOptions(opts...),
 	)
+	brainServiceClassifyApplicationHandler := connect.NewUnaryHandler(
+		BrainServiceClassifyApplicationProcedure,
+		svc.ClassifyApplication,
+		connect.WithSchema(brainServiceMethods.ByName("ClassifyApplication")),
+		connect.WithHandlerOptions(opts...),
+	)
+	brainServiceClassifyWebsiteHandler := connect.NewUnaryHandler(
+		BrainServiceClassifyWebsiteProcedure,
+		svc.ClassifyWebsite,
+		connect.WithSchema(brainServiceMethods.ByName("ClassifyWebsite")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/brain.v1.BrainService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BrainServiceDeviceHandshakeProcedure:
 			brainServiceDeviceHandshakeHandler.ServeHTTP(w, r)
+		case BrainServiceClassifyApplicationProcedure:
+			brainServiceClassifyApplicationHandler.ServeHTTP(w, r)
+		case BrainServiceClassifyWebsiteProcedure:
+			brainServiceClassifyWebsiteHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -106,4 +158,12 @@ type UnimplementedBrainServiceHandler struct{}
 
 func (UnimplementedBrainServiceHandler) DeviceHandshake(context.Context, *connect.Request[v1.DeviceHandshakeRequest]) (*connect.Response[v1.DeviceHandshakeResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.DeviceHandshake is not implemented"))
+}
+
+func (UnimplementedBrainServiceHandler) ClassifyApplication(context.Context, *connect.Request[v1.ClassifyApplicationRequest]) (*connect.Response[v1.ClassifyApplicationResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.ClassifyApplication is not implemented"))
+}
+
+func (UnimplementedBrainServiceHandler) ClassifyWebsite(context.Context, *connect.Request[v1.ClassifyWebsiteRequest]) (*connect.Response[v1.ClassifyWebsiteResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.ClassifyWebsite is not implemented"))
 }

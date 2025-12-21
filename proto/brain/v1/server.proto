@@ -8,6 +8,11 @@ option go_package = "github.com/focusd-so/brain/gen/brain/v1;brainv1";
 
 service BrainService {
     rpc DeviceHandshake(DeviceHandshakeRequest) returns (DeviceHandshakeResponse);
+
+
+    // classification
+    rpc ClassifyApplication(ClassifyApplicationRequest) returns (ClassifyApplicationResponse);
+    rpc ClassifyWebsite(ClassifyWebsiteRequest) returns (ClassifyWebsiteResponse);
 }
 
 message DeviceHandshakeRequest {
@@ -16,4 +21,28 @@ message DeviceHandshakeRequest {
 
 message DeviceHandshakeResponse {
     string token = 1;
+}
+
+message ClassifyApplicationRequest {
+    string application_name = 1;
+    string application_bundle_id = 2;
+    string window_title = 3;
+}
+
+message ClassifyApplicationResponse {
+    string classification = 1;          // productive, supporting, neutral, distracting
+    string reasoning = 2;               // Brief explanation
+    repeated string tags = 3;           // work, research, code-editor, etc.
+    optional string detected_project = 4; // For code editors only
+}
+
+message ClassifyWebsiteRequest {
+    string url = 1;
+    optional string title = 2;          // Page title if known
+}
+
+message ClassifyWebsiteResponse {
+    string classification = 1;          // focused, supporting, neutral, distracting
+    string reasoning = 2;
+    repeated string tags = 3;
 }

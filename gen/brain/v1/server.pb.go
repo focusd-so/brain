@@ -110,6 +110,246 @@ func (x *DeviceHandshakeResponse) GetToken() string {
 	return ""
 }
 
+type ClassifyApplicationRequest struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	ApplicationName     string                 `protobuf:"bytes,1,opt,name=application_name,json=applicationName,proto3" json:"application_name,omitempty"`
+	ApplicationBundleId string                 `protobuf:"bytes,2,opt,name=application_bundle_id,json=applicationBundleId,proto3" json:"application_bundle_id,omitempty"`
+	WindowTitle         string                 `protobuf:"bytes,3,opt,name=window_title,json=windowTitle,proto3" json:"window_title,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *ClassifyApplicationRequest) Reset() {
+	*x = ClassifyApplicationRequest{}
+	mi := &file_brain_v1_server_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClassifyApplicationRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClassifyApplicationRequest) ProtoMessage() {}
+
+func (x *ClassifyApplicationRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClassifyApplicationRequest.ProtoReflect.Descriptor instead.
+func (*ClassifyApplicationRequest) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ClassifyApplicationRequest) GetApplicationName() string {
+	if x != nil {
+		return x.ApplicationName
+	}
+	return ""
+}
+
+func (x *ClassifyApplicationRequest) GetApplicationBundleId() string {
+	if x != nil {
+		return x.ApplicationBundleId
+	}
+	return ""
+}
+
+func (x *ClassifyApplicationRequest) GetWindowTitle() string {
+	if x != nil {
+		return x.WindowTitle
+	}
+	return ""
+}
+
+type ClassifyApplicationResponse struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Classification  string                 `protobuf:"bytes,1,opt,name=classification,proto3" json:"classification,omitempty"`                                // productive, supporting, neutral, distracting
+	Reasoning       string                 `protobuf:"bytes,2,opt,name=reasoning,proto3" json:"reasoning,omitempty"`                                          // Brief explanation
+	Tags            []string               `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty"`                                                    // work, research, code-editor, etc.
+	DetectedProject *string                `protobuf:"bytes,4,opt,name=detected_project,json=detectedProject,proto3,oneof" json:"detected_project,omitempty"` // For code editors only
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ClassifyApplicationResponse) Reset() {
+	*x = ClassifyApplicationResponse{}
+	mi := &file_brain_v1_server_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClassifyApplicationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClassifyApplicationResponse) ProtoMessage() {}
+
+func (x *ClassifyApplicationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClassifyApplicationResponse.ProtoReflect.Descriptor instead.
+func (*ClassifyApplicationResponse) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *ClassifyApplicationResponse) GetClassification() string {
+	if x != nil {
+		return x.Classification
+	}
+	return ""
+}
+
+func (x *ClassifyApplicationResponse) GetReasoning() string {
+	if x != nil {
+		return x.Reasoning
+	}
+	return ""
+}
+
+func (x *ClassifyApplicationResponse) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
+func (x *ClassifyApplicationResponse) GetDetectedProject() string {
+	if x != nil && x.DetectedProject != nil {
+		return *x.DetectedProject
+	}
+	return ""
+}
+
+type ClassifyWebsiteRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	Title         *string                `protobuf:"bytes,2,opt,name=title,proto3,oneof" json:"title,omitempty"` // Page title if known
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ClassifyWebsiteRequest) Reset() {
+	*x = ClassifyWebsiteRequest{}
+	mi := &file_brain_v1_server_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClassifyWebsiteRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClassifyWebsiteRequest) ProtoMessage() {}
+
+func (x *ClassifyWebsiteRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClassifyWebsiteRequest.ProtoReflect.Descriptor instead.
+func (*ClassifyWebsiteRequest) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ClassifyWebsiteRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+func (x *ClassifyWebsiteRequest) GetTitle() string {
+	if x != nil && x.Title != nil {
+		return *x.Title
+	}
+	return ""
+}
+
+type ClassifyWebsiteResponse struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Classification string                 `protobuf:"bytes,1,opt,name=classification,proto3" json:"classification,omitempty"` // focused, supporting, neutral, distracting
+	Reasoning      string                 `protobuf:"bytes,2,opt,name=reasoning,proto3" json:"reasoning,omitempty"`
+	Tags           []string               `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *ClassifyWebsiteResponse) Reset() {
+	*x = ClassifyWebsiteResponse{}
+	mi := &file_brain_v1_server_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ClassifyWebsiteResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ClassifyWebsiteResponse) ProtoMessage() {}
+
+func (x *ClassifyWebsiteResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ClassifyWebsiteResponse.ProtoReflect.Descriptor instead.
+func (*ClassifyWebsiteResponse) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *ClassifyWebsiteResponse) GetClassification() string {
+	if x != nil {
+		return x.Classification
+	}
+	return ""
+}
+
+func (x *ClassifyWebsiteResponse) GetReasoning() string {
+	if x != nil {
+		return x.Reasoning
+	}
+	return ""
+}
+
+func (x *ClassifyWebsiteResponse) GetTags() []string {
+	if x != nil {
+		return x.Tags
+	}
+	return nil
+}
+
 var File_brain_v1_server_proto protoreflect.FileDescriptor
 
 const file_brain_v1_server_proto_rawDesc = "" +
@@ -118,9 +358,29 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\x16DeviceHandshakeRequest\x12-\n" +
 	"\x12device_fingerprint\x18\x01 \x01(\tR\x11deviceFingerprint\"/\n" +
 	"\x17DeviceHandshakeResponse\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token2f\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\"\x9e\x01\n" +
+	"\x1aClassifyApplicationRequest\x12)\n" +
+	"\x10application_name\x18\x01 \x01(\tR\x0fapplicationName\x122\n" +
+	"\x15application_bundle_id\x18\x02 \x01(\tR\x13applicationBundleId\x12!\n" +
+	"\fwindow_title\x18\x03 \x01(\tR\vwindowTitle\"\xbc\x01\n" +
+	"\x1bClassifyApplicationResponse\x12&\n" +
+	"\x0eclassification\x18\x01 \x01(\tR\x0eclassification\x12\x1c\n" +
+	"\treasoning\x18\x02 \x01(\tR\treasoning\x12\x12\n" +
+	"\x04tags\x18\x03 \x03(\tR\x04tags\x12.\n" +
+	"\x10detected_project\x18\x04 \x01(\tH\x00R\x0fdetectedProject\x88\x01\x01B\x13\n" +
+	"\x11_detected_project\"O\n" +
+	"\x16ClassifyWebsiteRequest\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\x12\x19\n" +
+	"\x05title\x18\x02 \x01(\tH\x00R\x05title\x88\x01\x01B\b\n" +
+	"\x06_title\"s\n" +
+	"\x17ClassifyWebsiteResponse\x12&\n" +
+	"\x0eclassification\x18\x01 \x01(\tR\x0eclassification\x12\x1c\n" +
+	"\treasoning\x18\x02 \x01(\tR\treasoning\x12\x12\n" +
+	"\x04tags\x18\x03 \x03(\tR\x04tags2\xa2\x02\n" +
 	"\fBrainService\x12V\n" +
-	"\x0fDeviceHandshake\x12 .brain.v1.DeviceHandshakeRequest\x1a!.brain.v1.DeviceHandshakeResponseB1Z/github.com/focusd-so/brain/gen/brain/v1;brainv1b\x06proto3"
+	"\x0fDeviceHandshake\x12 .brain.v1.DeviceHandshakeRequest\x1a!.brain.v1.DeviceHandshakeResponse\x12b\n" +
+	"\x13ClassifyApplication\x12$.brain.v1.ClassifyApplicationRequest\x1a%.brain.v1.ClassifyApplicationResponse\x12V\n" +
+	"\x0fClassifyWebsite\x12 .brain.v1.ClassifyWebsiteRequest\x1a!.brain.v1.ClassifyWebsiteResponseB1Z/github.com/focusd-so/brain/gen/brain/v1;brainv1b\x06proto3"
 
 var (
 	file_brain_v1_server_proto_rawDescOnce sync.Once
@@ -134,16 +394,24 @@ func file_brain_v1_server_proto_rawDescGZIP() []byte {
 	return file_brain_v1_server_proto_rawDescData
 }
 
-var file_brain_v1_server_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_brain_v1_server_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_brain_v1_server_proto_goTypes = []any{
-	(*DeviceHandshakeRequest)(nil),  // 0: brain.v1.DeviceHandshakeRequest
-	(*DeviceHandshakeResponse)(nil), // 1: brain.v1.DeviceHandshakeResponse
+	(*DeviceHandshakeRequest)(nil),      // 0: brain.v1.DeviceHandshakeRequest
+	(*DeviceHandshakeResponse)(nil),     // 1: brain.v1.DeviceHandshakeResponse
+	(*ClassifyApplicationRequest)(nil),  // 2: brain.v1.ClassifyApplicationRequest
+	(*ClassifyApplicationResponse)(nil), // 3: brain.v1.ClassifyApplicationResponse
+	(*ClassifyWebsiteRequest)(nil),      // 4: brain.v1.ClassifyWebsiteRequest
+	(*ClassifyWebsiteResponse)(nil),     // 5: brain.v1.ClassifyWebsiteResponse
 }
 var file_brain_v1_server_proto_depIdxs = []int32{
 	0, // 0: brain.v1.BrainService.DeviceHandshake:input_type -> brain.v1.DeviceHandshakeRequest
-	1, // 1: brain.v1.BrainService.DeviceHandshake:output_type -> brain.v1.DeviceHandshakeResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	2, // 1: brain.v1.BrainService.ClassifyApplication:input_type -> brain.v1.ClassifyApplicationRequest
+	4, // 2: brain.v1.BrainService.ClassifyWebsite:input_type -> brain.v1.ClassifyWebsiteRequest
+	1, // 3: brain.v1.BrainService.DeviceHandshake:output_type -> brain.v1.DeviceHandshakeResponse
+	3, // 4: brain.v1.BrainService.ClassifyApplication:output_type -> brain.v1.ClassifyApplicationResponse
+	5, // 5: brain.v1.BrainService.ClassifyWebsite:output_type -> brain.v1.ClassifyWebsiteResponse
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -154,13 +422,15 @@ func file_brain_v1_server_proto_init() {
 	if File_brain_v1_server_proto != nil {
 		return
 	}
+	file_brain_v1_server_proto_msgTypes[3].OneofWrappers = []any{}
+	file_brain_v1_server_proto_msgTypes[4].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_brain_v1_server_proto_rawDesc), len(file_brain_v1_server_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -14,6 +14,7 @@ import (
 	"connectrpc.com/validate"
 	"github.com/focusd-so/brain/gen/brain/v1/brainv1connect"
 	"github.com/focusd-so/brain/gen/common"
+	"github.com/focusd-so/brain/internal/auth"
 	"github.com/focusd-so/brain/internal/brain"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v3"
@@ -70,7 +71,7 @@ var Command = &cli.Command{
 
 		slog.Info("connected to turso", "url", url)
 
-		if err := gormDB.AutoMigrate(&common.User{}, &common.Nonce{}); err != nil {
+		if err := gormDB.AutoMigrate(&common.UserORM{}, &common.NonceORM{}, &common.PromptHistoryORM{}); err != nil {
 			return fmt.Errorf("failed to auto migrate: %w", err)
 		}
 
@@ -83,7 +84,10 @@ var Command = &cli.Command{
 		path, handler := brainv1connect.NewBrainServiceHandler(
 			engineService,
 			// Validation via Protovalidate is almost always recommended
-			connect.WithInterceptors(validate.NewInterceptor()),
+			connect.WithInterceptors(
+				auth.NewAuthInterceptor(),
+				validate.NewInterceptor(),
+			),
 		)
 		mux.Handle(path, handler)
 
@@ -111,8 +115,6 @@ var Command = &cli.Command{
 		<-sigint
 		slog.Info("shutting down engine service")
 		server.Shutdown(context.Background())
-		return nil
-
 		return nil
 	},
 }

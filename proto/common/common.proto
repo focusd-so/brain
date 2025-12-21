@@ -27,3 +27,15 @@ message Nonce {
     int64 created_at = 2 [(gorm.field).tag = {not_null: true}];
     int64 expires_at = 3 [(gorm.field).tag = {not_null: true}];
 }
+
+// PromptHistory caches AI prompt/response pairs for reuse
+message PromptHistory {
+    option (gorm.opts) = {
+        ormable: true,
+    };
+
+    string prompt_hash = 1 [(gorm.field).tag = {primary_key: true}];
+    string response_json = 2 [(gorm.field).tag = {not_null: true, type: "TEXT"}];
+    int64 created_at = 3 [(gorm.field).tag = {not_null: true}];
+    int64 expires_at = 4 [(gorm.field).tag = {not_null: true}];
+}

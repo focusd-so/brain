@@ -158,6 +158,75 @@ func (x *Nonce) GetExpiresAt() int64 {
 	return 0
 }
 
+// PromptHistory caches AI prompt/response pairs for reuse
+type PromptHistory struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	PromptHash    string                 `protobuf:"bytes,1,opt,name=prompt_hash,json=promptHash,proto3" json:"prompt_hash,omitempty"`
+	ResponseJson  string                 `protobuf:"bytes,2,opt,name=response_json,json=responseJson,proto3" json:"response_json,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	ExpiresAt     int64                  `protobuf:"varint,4,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PromptHistory) Reset() {
+	*x = PromptHistory{}
+	mi := &file_common_common_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PromptHistory) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PromptHistory) ProtoMessage() {}
+
+func (x *PromptHistory) ProtoReflect() protoreflect.Message {
+	mi := &file_common_common_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PromptHistory.ProtoReflect.Descriptor instead.
+func (*PromptHistory) Descriptor() ([]byte, []int) {
+	return file_common_common_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *PromptHistory) GetPromptHash() string {
+	if x != nil {
+		return x.PromptHash
+	}
+	return ""
+}
+
+func (x *PromptHistory) GetResponseJson() string {
+	if x != nil {
+		return x.ResponseJson
+	}
+	return ""
+}
+
+func (x *PromptHistory) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *PromptHistory) GetExpiresAt() int64 {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return 0
+}
+
 var File_common_common_proto protoreflect.FileDescriptor
 
 const file_common_common_proto_rawDesc = "" +
@@ -183,6 +252,19 @@ const file_common_common_proto_rawDesc = "" +
 	"\x02@\x01R\tcreatedAt\x12'\n" +
 	"\n" +
 	"expires_at\x18\x03 \x01(\x03B\b\xba\xb9\x19\x04\n" +
+	"\x02@\x01R\texpiresAt:\x06\xba\xb9\x19\x02\b\x01\"\xc9\x01\n" +
+	"\rPromptHistory\x12)\n" +
+	"\vprompt_hash\x18\x01 \x01(\tB\b\xba\xb9\x19\x04\n" +
+	"\x02(\x01R\n" +
+	"promptHash\x123\n" +
+	"\rresponse_json\x18\x02 \x01(\tB\x0e\xba\xb9\x19\n" +
+	"\n" +
+	"\b\x12\x04TEXT@\x01R\fresponseJson\x12'\n" +
+	"\n" +
+	"created_at\x18\x03 \x01(\x03B\b\xba\xb9\x19\x04\n" +
+	"\x02@\x01R\tcreatedAt\x12'\n" +
+	"\n" +
+	"expires_at\x18\x04 \x01(\x03B\b\xba\xb9\x19\x04\n" +
 	"\x02@\x01R\texpiresAt:\x06\xba\xb9\x19\x02\b\x01B5Z3github.com/focusd-so/brain/gen/common/common;commonb\x06proto3"
 
 var (
@@ -197,10 +279,11 @@ func file_common_common_proto_rawDescGZIP() []byte {
 	return file_common_common_proto_rawDescData
 }
 
-var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_common_common_proto_goTypes = []any{
-	(*User)(nil),  // 0: common.User
-	(*Nonce)(nil), // 1: common.Nonce
+	(*User)(nil),          // 0: common.User
+	(*Nonce)(nil),         // 1: common.Nonce
+	(*PromptHistory)(nil), // 2: common.PromptHistory
 }
 var file_common_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -221,7 +304,7 @@ func file_common_common_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_common_proto_rawDesc), len(file_common_common_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
