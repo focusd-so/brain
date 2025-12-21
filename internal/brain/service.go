@@ -138,19 +138,19 @@ func (s *ServiceImpl) verifyHMAC(req *connect.Request[brainv1.DeviceHandshakeReq
 	return nil
 }
 
-func (s *ServiceImpl) upsertShadowUser(ctx context.Context, fingerprint string) (*common.User, error) {
-	var user common.User
+func (s *ServiceImpl) upsertShadowUser(ctx context.Context, fingerprint string) (common.User, error) {
+	var user common.UserORM
 	err := s.gormDB.Where("device_fingerprint_hash = ?", fingerprint).First(&user).Error
 	if err == nil {
-		return &user, nil
+		return user.ToPB(ctx)
 	}
 
 	if err != gorm.ErrRecordNotFound {
-		return nil, err
+		return common.User{}, err
 	}
 
 	// Create new user
-	newUser := common.User{
+	newUser := common.UserORM{
 		DeviceFingerprintHash: fingerprint,
 		Role:                  "anonymous",
 		OsInfo:                "unknown", // TODO: Populate from request?
@@ -158,8 +158,8 @@ func (s *ServiceImpl) upsertShadowUser(ctx context.Context, fingerprint string) 
 	}
 
 	if err := s.gormDB.Create(&newUser).Error; err != nil {
-		return nil, err
+		return common.User{}, err
 	}
 
-	return &newUser, nil
+	return newUser.ToPB(ctx)
 }
