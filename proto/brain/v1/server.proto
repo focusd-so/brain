@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package brain.v1;
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/focusd-so/brain/gen/brain/v1;brainv1";
+
+service BrainService {
+    rpc DeviceHandshake(DeviceHandshakeRequest) returns (DeviceHandshakeResponse);
+}
+
+message DeviceHandshakeRequest {
+    string device_fingerprint = 1;
+}
+
+message DeviceHandshakeResponse {
+    string token = 1;
+}
