@@ -34,12 +34,13 @@ var Command = &cli.Command{
 			Aliases: []string{"p"},
 		},
 		&cli.StringFlag{
-			Name:  "turso-db-url",
-			Value: "libsql://focusd-aram.aws-us-east-1.turso.io",
+			Name:    "turso-db-url",
+			Value:   "libsql://focusd-aram.aws-us-east-1.turso.io",
+			Sources: cli.EnvVars("FOCUSD_TURSO_CONNECTION_PATH"),
 		},
 		&cli.StringFlag{
 			Name:    "turso-db-token",
-			Sources: cli.EnvVars("TURSO_DB_TOKEN"),
+			Sources: cli.EnvVars("FOCUSD_TURSO_CONNECTION_TOKEN"),
 		},
 	},
 	Action: func(ctx context.Context, cmd *cli.Command) error {

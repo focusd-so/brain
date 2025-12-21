@@ -31,8 +31,8 @@ func TestDeviceHandshake_HMACVerification(t *testing.T) {
 	// 2. Setup Service
 	// Set valid hex secret
 	validHexSecret := "12075610360460580dbafc72acfbdd9a4db7890058f409ccaa6ce481396ab52d"
-	os.Setenv("HMAC_SECRET_KEY", validHexSecret)
-	defer os.Unsetenv("HMAC_SECRET_KEY")
+	os.Setenv("FOCUSD_HMAC_SECRET_KEY", validHexSecret)
+	defer os.Unsetenv("FOCUSD_HMAC_SECRET_KEY")
 
 	svc := NewServiceImpl(db)
 
@@ -62,16 +62,16 @@ func TestDeviceHandshake_HMACVerification(t *testing.T) {
 	// because we are only testing up to HMAC verification.
 	// However, if HMAC fails, we get "signature verification failed".
 	// If HMAC succeeds, we proceed.
-	// Since we haven't mocked UpsertShadowUser or MintToken logic fully (MintToken relies on PASETO_KEYS env),
-	// let's set PASETO_KEYS too to pass MintToken or expect a different error.
+	// Since we haven't mocked UpsertShadowUser or MintToken logic fully (MintToken relies on FOCUSD_PASETO_KEYS env),
+	// let's set FOCUSD_PASETO_KEYS too to pass MintToken or expect a different error.
 
 	// Set mock PASETO key for MintToken to succeed (if it gets that far)
-	os.Setenv("PASETO_KEYS", "0000000000000000000000000000000000000000000000000000000000000000") // 32 bytes hex? No, 32 bytes is 64 hex chars.
+	os.Setenv("FOCUSD_PASETO_KEYS", "0000000000000000000000000000000000000000000000000000000000000000") // 32 bytes hex? No, 32 bytes is 64 hex chars.
 	// 32 bytes = 64 hex chars.
 	// "00...00" (64 zeros)
 	mockPasetoKey := "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f"
-	os.Setenv("PASETO_KEYS", mockPasetoKey)
-	defer os.Unsetenv("PASETO_KEYS")
+	os.Setenv("FOCUSD_PASETO_KEYS", mockPasetoKey)
+	defer os.Unsetenv("FOCUSD_PASETO_KEYS")
 
 	_, err = svc.DeviceHandshake(context.Background(), req)
 
