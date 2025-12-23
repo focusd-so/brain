@@ -126,37 +126,85 @@ func ValidateToken(tokenStr string) (*UserClaims, error) {
 
 type authKey struct{}
 
-// NewAuthInterceptor creates a ConnectRPC interceptor
-func NewAuthInterceptor() connect.UnaryInterceptorFunc {
-	return func(next connect.UnaryFunc) connect.UnaryFunc {
-		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
-			// 1. Skip Auth for specific public endpoints (like Handshake)
-			if req.Spec().Procedure == brainv1connect.BrainServiceDeviceHandshakeProcedure {
-				return next(ctx, req)
-			}
+// authInterceptor implements the connect.Interceptor interface
+type authInterceptor struct{}
 
-			// 2. Extract Header
-			token := req.Header().Get("Authorization")
-			// Standard format: "Bearer v2.local.AAAA..."
-			token = strings.TrimPrefix(token, "Bearer ")
-			token = strings.TrimSpace(token)
-
-			if token == "" {
-				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("missing token"))
-			}
-
-			// 3. Validate PASETO
-			claims, err := ValidateToken(token)
-			if err != nil {
-				return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("invalid or expired session"))
-			}
-
-			// 4. Inject Claims into Context
-			ctx = context.WithValue(ctx, authKey{}, claims)
-
+// WrapUnary implements unary RPC authentication
+func (i *authInterceptor) WrapUnary(next connect.UnaryFunc) connect.UnaryFunc {
+	return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
+		// 1. Skip Auth for specific public endpoints (like Handshake)
+		if req.Spec().Procedure == brainv1connect.BrainServiceDeviceHandshakeProcedure {
 			return next(ctx, req)
 		}
+
+		// 2. Extract Header
+		token := req.Header().Get("Authorization")
+		// Standard format: "Bearer v2.local.AAAA..."
+		token = strings.TrimPrefix(token, "Bearer ")
+		token = strings.TrimSpace(token)
+
+		if token == "" {
+			return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("missing token"))
+		}
+
+		// 3. Validate PASETO
+		claims, err := ValidateToken(token)
+		if err != nil {
+			return nil, connect.NewError(connect.CodeUnauthenticated, errors.New("invalid or expired session"))
+		}
+
+		// 4. Inject Claims into Context
+		ctx = context.WithValue(ctx, authKey{}, claims)
+
+		return next(ctx, req)
 	}
+}
+
+// WrapStreamingClient is a no-op for server-side interceptors
+func (i *authInterceptor) WrapStreamingClient(next connect.StreamingClientFunc) connect.StreamingClientFunc {
+	return next
+}
+
+// WrapStreamingHandler implements streaming RPC authentication
+func (i *authInterceptor) WrapStreamingHandler(next connect.StreamingHandlerFunc) connect.StreamingHandlerFunc {
+	return func(ctx context.Context, conn connect.StreamingHandlerConn) error {
+		// 1. Skip Auth for specific public endpoints (like Handshake)
+		if conn.Spec().Procedure == brainv1connect.BrainServiceDeviceHandshakeProcedure {
+			return next(ctx, conn)
+		}
+
+		// 2. Extract Header
+		token := conn.RequestHeader().Get("Authorization")
+		// Standard format: "Bearer v2.local.AAAA..."
+		token = strings.TrimPrefix(token, "Bearer ")
+		token = strings.TrimSpace(token)
+
+		if token == "" {
+			return connect.NewError(connect.CodeUnauthenticated, errors.New("missing token"))
+		}
+
+		// 3. Validate PASETO
+		claims, err := ValidateToken(token)
+		if err != nil {
+			return connect.NewError(connect.CodeUnauthenticated, errors.New("invalid or expired session"))
+		}
+
+		// 4. Inject Claims into Context
+		ctx = context.WithValue(ctx, authKey{}, claims)
+
+		return next(ctx, conn)
+	}
+}
+
+// NewAuthInterceptor creates a ConnectRPC interceptor for both unary and streaming
+func NewAuthInterceptor() connect.Interceptor {
+	return &authInterceptor{}
+}
+
+// NewStreamAuthInterceptor is deprecated - use NewAuthInterceptor which handles both
+// Kept for backwards compatibility
+func NewStreamAuthInterceptor() connect.Interceptor {
+	return NewAuthInterceptor()
 }
 
 // GetUser extracts user data from context in your API handlers

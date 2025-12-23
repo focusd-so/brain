@@ -103,11 +103,14 @@ message AgentSessionRequest {
         repeated Tool tools = 4;
     }
 
-    // Initial handshake: electron declares all available agents and their tools
-    message Handshake {
-        string session_id = 1;            // Client-generated UUID for this session
+    message TerminateExecution {
+        string reason = 1;
+    }
+    
+    message RunRequest {
+        string instruction = 1;
         repeated Agent agents = 2;
-        map<string, string> metadata = 3; // e.g., {"app_version": "1.0.0", "platform": "darwin"}
+        string user_message = 3;
     }
 
     // Response to brain's tool call request
@@ -143,7 +146,7 @@ message AgentSessionRequest {
     }
 
     oneof message {
-        Handshake handshake = 1;
+        RunRequest run_request = 1;
         ToolCallResponse tool_call_response = 2;
         Heartbeat heartbeat = 3;
         SessionEnd session_end = 4;
@@ -151,23 +154,6 @@ message AgentSessionRequest {
 }
 
 message AgentSessionResponse {
-    // Acknowledgment of handshake
-    message HandshakeAck {
-        string session_id = 1;
-        bool accepted = 2;
-        repeated string registered_agents = 3; // Confirms which agents were successfully registered
-        string error = 4;                      // Populated if not accepted
-    }
-
-    // Brain requests electron to execute a tool
-    message ToolCallRequest {
-        string request_id = 1;            // UUID to correlate with ToolCallResponse
-        string agent_name = 2;            // Which agent owns this tool
-        string tool_name = 3;             // Which tool to execute
-        string input = 4;                 // JSON-encoded input matching tool's input_schema
-        int32 timeout_seconds = 5;        // Optional: max execution time
-    }
-
     // Session-level error (e.g., invalid tool requested, session error)
     message Error {
         string code = 1;    // e.g., "TOOL_NOT_FOUND", "SESSION_ERROR", "INVALID_INPUT"
@@ -185,8 +171,19 @@ message AgentSessionResponse {
         bool acknowledged = 1;
     }
 
+    message ToolCallRequest {
+        string request_id = 1;
+        string tool_name = 2;
+        string input = 3;
+    }
+
+    // Response with generated content from the agent
+    message RunResponse {
+        string content = 1;
+    }
+
     oneof message {
-        HandshakeAck handshake_ack = 1;
+        RunResponse run_response = 1;
         ToolCallRequest tool_call_request = 2;
         Error error = 3;
         HeartbeatAck heartbeat_ack = 4;

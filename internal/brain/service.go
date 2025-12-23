@@ -70,7 +70,7 @@ func (s *ServiceImpl) DeviceHandshake(ctx context.Context, req *connect.Request[
 	// ---------------------------------------------------------
 
 	return connect.NewResponse(&brainv1.DeviceHandshakeResponse{
-		Token: sessionToken,
+		SessionToken: sessionToken,
 	}), nil
 }
 

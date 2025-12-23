@@ -70,7 +70,7 @@ func (x AgentSessionRequest_ToolCallResponse_Status) Number() protoreflect.EnumN
 
 // Deprecated: Use AgentSessionRequest_ToolCallResponse_Status.Descriptor instead.
 func (AgentSessionRequest_ToolCallResponse_Status) EnumDescriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 2, 0}
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 3, 0}
 }
 
 type DeviceHandshakeRequest struct {
@@ -495,7 +495,7 @@ type AgentSessionRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Message:
 	//
-	//	*AgentSessionRequest_Handshake_
+	//	*AgentSessionRequest_RunRequest_
 	//	*AgentSessionRequest_ToolCallResponse_
 	//	*AgentSessionRequest_Heartbeat_
 	//	*AgentSessionRequest_SessionEnd_
@@ -541,10 +541,10 @@ func (x *AgentSessionRequest) GetMessage() isAgentSessionRequest_Message {
 	return nil
 }
 
-func (x *AgentSessionRequest) GetHandshake() *AgentSessionRequest_Handshake {
+func (x *AgentSessionRequest) GetRunRequest() *AgentSessionRequest_RunRequest {
 	if x != nil {
-		if x, ok := x.Message.(*AgentSessionRequest_Handshake_); ok {
-			return x.Handshake
+		if x, ok := x.Message.(*AgentSessionRequest_RunRequest_); ok {
+			return x.RunRequest
 		}
 	}
 	return nil
@@ -581,8 +581,8 @@ type isAgentSessionRequest_Message interface {
 	isAgentSessionRequest_Message()
 }
 
-type AgentSessionRequest_Handshake_ struct {
-	Handshake *AgentSessionRequest_Handshake `protobuf:"bytes,1,opt,name=handshake,proto3,oneof"`
+type AgentSessionRequest_RunRequest_ struct {
+	RunRequest *AgentSessionRequest_RunRequest `protobuf:"bytes,1,opt,name=run_request,json=runRequest,proto3,oneof"`
 }
 
 type AgentSessionRequest_ToolCallResponse_ struct {
@@ -597,7 +597,7 @@ type AgentSessionRequest_SessionEnd_ struct {
 	SessionEnd *AgentSessionRequest_SessionEnd `protobuf:"bytes,4,opt,name=session_end,json=sessionEnd,proto3,oneof"`
 }
 
-func (*AgentSessionRequest_Handshake_) isAgentSessionRequest_Message() {}
+func (*AgentSessionRequest_RunRequest_) isAgentSessionRequest_Message() {}
 
 func (*AgentSessionRequest_ToolCallResponse_) isAgentSessionRequest_Message() {}
 
@@ -609,7 +609,7 @@ type AgentSessionResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Message:
 	//
-	//	*AgentSessionResponse_HandshakeAck_
+	//	*AgentSessionResponse_RunResponse_
 	//	*AgentSessionResponse_ToolCallRequest_
 	//	*AgentSessionResponse_Error_
 	//	*AgentSessionResponse_HeartbeatAck_
@@ -656,10 +656,10 @@ func (x *AgentSessionResponse) GetMessage() isAgentSessionResponse_Message {
 	return nil
 }
 
-func (x *AgentSessionResponse) GetHandshakeAck() *AgentSessionResponse_HandshakeAck {
+func (x *AgentSessionResponse) GetRunResponse() *AgentSessionResponse_RunResponse {
 	if x != nil {
-		if x, ok := x.Message.(*AgentSessionResponse_HandshakeAck_); ok {
-			return x.HandshakeAck
+		if x, ok := x.Message.(*AgentSessionResponse_RunResponse_); ok {
+			return x.RunResponse
 		}
 	}
 	return nil
@@ -705,8 +705,8 @@ type isAgentSessionResponse_Message interface {
 	isAgentSessionResponse_Message()
 }
 
-type AgentSessionResponse_HandshakeAck_ struct {
-	HandshakeAck *AgentSessionResponse_HandshakeAck `protobuf:"bytes,1,opt,name=handshake_ack,json=handshakeAck,proto3,oneof"`
+type AgentSessionResponse_RunResponse_ struct {
+	RunResponse *AgentSessionResponse_RunResponse `protobuf:"bytes,1,opt,name=run_response,json=runResponse,proto3,oneof"`
 }
 
 type AgentSessionResponse_ToolCallRequest_ struct {
@@ -725,7 +725,7 @@ type AgentSessionResponse_SessionEndAck_ struct {
 	SessionEndAck *AgentSessionResponse_SessionEndAck `protobuf:"bytes,5,opt,name=session_end_ack,json=sessionEndAck,proto3,oneof"`
 }
 
-func (*AgentSessionResponse_HandshakeAck_) isAgentSessionResponse_Message() {}
+func (*AgentSessionResponse_RunResponse_) isAgentSessionResponse_Message() {}
 
 func (*AgentSessionResponse_ToolCallRequest_) isAgentSessionResponse_Message() {}
 
@@ -804,30 +804,27 @@ func (x *AgentSessionRequest_Agent) GetTools() []*AgentSessionRequest_Agent_Tool
 	return nil
 }
 
-// Initial handshake: electron declares all available agents and their tools
-type AgentSessionRequest_Handshake struct {
-	state         protoimpl.MessageState       `protogen:"open.v1"`
-	SessionId     string                       `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"` // Client-generated UUID for this session
-	Agents        []*AgentSessionRequest_Agent `protobuf:"bytes,2,rep,name=agents,proto3" json:"agents,omitempty"`
-	Metadata      map[string]string            `protobuf:"bytes,3,rep,name=metadata,proto3" json:"metadata,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"` // e.g., {"app_version": "1.0.0", "platform": "darwin"}
+type AgentSessionRequest_TerminateExecution struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Reason        string                 `protobuf:"bytes,1,opt,name=reason,proto3" json:"reason,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AgentSessionRequest_Handshake) Reset() {
-	*x = AgentSessionRequest_Handshake{}
+func (x *AgentSessionRequest_TerminateExecution) Reset() {
+	*x = AgentSessionRequest_TerminateExecution{}
 	mi := &file_brain_v1_server_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AgentSessionRequest_Handshake) String() string {
+func (x *AgentSessionRequest_TerminateExecution) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AgentSessionRequest_Handshake) ProtoMessage() {}
+func (*AgentSessionRequest_TerminateExecution) ProtoMessage() {}
 
-func (x *AgentSessionRequest_Handshake) ProtoReflect() protoreflect.Message {
+func (x *AgentSessionRequest_TerminateExecution) ProtoReflect() protoreflect.Message {
 	mi := &file_brain_v1_server_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -839,30 +836,76 @@ func (x *AgentSessionRequest_Handshake) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AgentSessionRequest_Handshake.ProtoReflect.Descriptor instead.
-func (*AgentSessionRequest_Handshake) Descriptor() ([]byte, []int) {
+// Deprecated: Use AgentSessionRequest_TerminateExecution.ProtoReflect.Descriptor instead.
+func (*AgentSessionRequest_TerminateExecution) Descriptor() ([]byte, []int) {
 	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 1}
 }
 
-func (x *AgentSessionRequest_Handshake) GetSessionId() string {
+func (x *AgentSessionRequest_TerminateExecution) GetReason() string {
 	if x != nil {
-		return x.SessionId
+		return x.Reason
 	}
 	return ""
 }
 
-func (x *AgentSessionRequest_Handshake) GetAgents() []*AgentSessionRequest_Agent {
+type AgentSessionRequest_RunRequest struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Instruction   string                       `protobuf:"bytes,1,opt,name=instruction,proto3" json:"instruction,omitempty"`
+	Agents        []*AgentSessionRequest_Agent `protobuf:"bytes,2,rep,name=agents,proto3" json:"agents,omitempty"`
+	UserMessage   string                       `protobuf:"bytes,3,opt,name=user_message,json=userMessage,proto3" json:"user_message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AgentSessionRequest_RunRequest) Reset() {
+	*x = AgentSessionRequest_RunRequest{}
+	mi := &file_brain_v1_server_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AgentSessionRequest_RunRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AgentSessionRequest_RunRequest) ProtoMessage() {}
+
+func (x *AgentSessionRequest_RunRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AgentSessionRequest_RunRequest.ProtoReflect.Descriptor instead.
+func (*AgentSessionRequest_RunRequest) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 2}
+}
+
+func (x *AgentSessionRequest_RunRequest) GetInstruction() string {
+	if x != nil {
+		return x.Instruction
+	}
+	return ""
+}
+
+func (x *AgentSessionRequest_RunRequest) GetAgents() []*AgentSessionRequest_Agent {
 	if x != nil {
 		return x.Agents
 	}
 	return nil
 }
 
-func (x *AgentSessionRequest_Handshake) GetMetadata() map[string]string {
+func (x *AgentSessionRequest_RunRequest) GetUserMessage() string {
 	if x != nil {
-		return x.Metadata
+		return x.UserMessage
 	}
-	return nil
+	return ""
 }
 
 // Response to brain's tool call request
@@ -882,7 +925,7 @@ type AgentSessionRequest_ToolCallResponse struct {
 
 func (x *AgentSessionRequest_ToolCallResponse) Reset() {
 	*x = AgentSessionRequest_ToolCallResponse{}
-	mi := &file_brain_v1_server_proto_msgTypes[10]
+	mi := &file_brain_v1_server_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -894,7 +937,7 @@ func (x *AgentSessionRequest_ToolCallResponse) String() string {
 func (*AgentSessionRequest_ToolCallResponse) ProtoMessage() {}
 
 func (x *AgentSessionRequest_ToolCallResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[10]
+	mi := &file_brain_v1_server_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -907,7 +950,7 @@ func (x *AgentSessionRequest_ToolCallResponse) ProtoReflect() protoreflect.Messa
 
 // Deprecated: Use AgentSessionRequest_ToolCallResponse.ProtoReflect.Descriptor instead.
 func (*AgentSessionRequest_ToolCallResponse) Descriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 2}
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 3}
 }
 
 func (x *AgentSessionRequest_ToolCallResponse) GetRequestId() string {
@@ -955,7 +998,7 @@ type AgentSessionRequest_Heartbeat struct {
 
 func (x *AgentSessionRequest_Heartbeat) Reset() {
 	*x = AgentSessionRequest_Heartbeat{}
-	mi := &file_brain_v1_server_proto_msgTypes[11]
+	mi := &file_brain_v1_server_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -967,7 +1010,7 @@ func (x *AgentSessionRequest_Heartbeat) String() string {
 func (*AgentSessionRequest_Heartbeat) ProtoMessage() {}
 
 func (x *AgentSessionRequest_Heartbeat) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[11]
+	mi := &file_brain_v1_server_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -980,7 +1023,7 @@ func (x *AgentSessionRequest_Heartbeat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentSessionRequest_Heartbeat.ProtoReflect.Descriptor instead.
 func (*AgentSessionRequest_Heartbeat) Descriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 3}
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 4}
 }
 
 func (x *AgentSessionRequest_Heartbeat) GetTimestamp() int64 {
@@ -1000,7 +1043,7 @@ type AgentSessionRequest_SessionEnd struct {
 
 func (x *AgentSessionRequest_SessionEnd) Reset() {
 	*x = AgentSessionRequest_SessionEnd{}
-	mi := &file_brain_v1_server_proto_msgTypes[12]
+	mi := &file_brain_v1_server_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1012,7 +1055,7 @@ func (x *AgentSessionRequest_SessionEnd) String() string {
 func (*AgentSessionRequest_SessionEnd) ProtoMessage() {}
 
 func (x *AgentSessionRequest_SessionEnd) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[12]
+	mi := &file_brain_v1_server_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1025,7 +1068,7 @@ func (x *AgentSessionRequest_SessionEnd) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentSessionRequest_SessionEnd.ProtoReflect.Descriptor instead.
 func (*AgentSessionRequest_SessionEnd) Descriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 4}
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{6, 5}
 }
 
 func (x *AgentSessionRequest_SessionEnd) GetReason() string {
@@ -1048,7 +1091,7 @@ type AgentSessionRequest_Agent_Tool struct {
 
 func (x *AgentSessionRequest_Agent_Tool) Reset() {
 	*x = AgentSessionRequest_Agent_Tool{}
-	mi := &file_brain_v1_server_proto_msgTypes[13]
+	mi := &file_brain_v1_server_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1060,7 +1103,7 @@ func (x *AgentSessionRequest_Agent_Tool) String() string {
 func (*AgentSessionRequest_Agent_Tool) ProtoMessage() {}
 
 func (x *AgentSessionRequest_Agent_Tool) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[13]
+	mi := &file_brain_v1_server_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1104,152 +1147,6 @@ func (x *AgentSessionRequest_Agent_Tool) GetOutputSchema() string {
 	return ""
 }
 
-// Acknowledgment of handshake
-type AgentSessionResponse_HandshakeAck struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	SessionId        string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
-	Accepted         bool                   `protobuf:"varint,2,opt,name=accepted,proto3" json:"accepted,omitempty"`
-	RegisteredAgents []string               `protobuf:"bytes,3,rep,name=registered_agents,json=registeredAgents,proto3" json:"registered_agents,omitempty"` // Confirms which agents were successfully registered
-	Error            string                 `protobuf:"bytes,4,opt,name=error,proto3" json:"error,omitempty"`                                               // Populated if not accepted
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
-}
-
-func (x *AgentSessionResponse_HandshakeAck) Reset() {
-	*x = AgentSessionResponse_HandshakeAck{}
-	mi := &file_brain_v1_server_proto_msgTypes[15]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentSessionResponse_HandshakeAck) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentSessionResponse_HandshakeAck) ProtoMessage() {}
-
-func (x *AgentSessionResponse_HandshakeAck) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[15]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentSessionResponse_HandshakeAck.ProtoReflect.Descriptor instead.
-func (*AgentSessionResponse_HandshakeAck) Descriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 0}
-}
-
-func (x *AgentSessionResponse_HandshakeAck) GetSessionId() string {
-	if x != nil {
-		return x.SessionId
-	}
-	return ""
-}
-
-func (x *AgentSessionResponse_HandshakeAck) GetAccepted() bool {
-	if x != nil {
-		return x.Accepted
-	}
-	return false
-}
-
-func (x *AgentSessionResponse_HandshakeAck) GetRegisteredAgents() []string {
-	if x != nil {
-		return x.RegisteredAgents
-	}
-	return nil
-}
-
-func (x *AgentSessionResponse_HandshakeAck) GetError() string {
-	if x != nil {
-		return x.Error
-	}
-	return ""
-}
-
-// Brain requests electron to execute a tool
-type AgentSessionResponse_ToolCallRequest struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	RequestId      string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`                 // UUID to correlate with ToolCallResponse
-	AgentName      string                 `protobuf:"bytes,2,opt,name=agent_name,json=agentName,proto3" json:"agent_name,omitempty"`                 // Which agent owns this tool
-	ToolName       string                 `protobuf:"bytes,3,opt,name=tool_name,json=toolName,proto3" json:"tool_name,omitempty"`                    // Which tool to execute
-	Input          string                 `protobuf:"bytes,4,opt,name=input,proto3" json:"input,omitempty"`                                          // JSON-encoded input matching tool's input_schema
-	TimeoutSeconds int32                  `protobuf:"varint,5,opt,name=timeout_seconds,json=timeoutSeconds,proto3" json:"timeout_seconds,omitempty"` // Optional: max execution time
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
-}
-
-func (x *AgentSessionResponse_ToolCallRequest) Reset() {
-	*x = AgentSessionResponse_ToolCallRequest{}
-	mi := &file_brain_v1_server_proto_msgTypes[16]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AgentSessionResponse_ToolCallRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AgentSessionResponse_ToolCallRequest) ProtoMessage() {}
-
-func (x *AgentSessionResponse_ToolCallRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[16]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AgentSessionResponse_ToolCallRequest.ProtoReflect.Descriptor instead.
-func (*AgentSessionResponse_ToolCallRequest) Descriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 1}
-}
-
-func (x *AgentSessionResponse_ToolCallRequest) GetRequestId() string {
-	if x != nil {
-		return x.RequestId
-	}
-	return ""
-}
-
-func (x *AgentSessionResponse_ToolCallRequest) GetAgentName() string {
-	if x != nil {
-		return x.AgentName
-	}
-	return ""
-}
-
-func (x *AgentSessionResponse_ToolCallRequest) GetToolName() string {
-	if x != nil {
-		return x.ToolName
-	}
-	return ""
-}
-
-func (x *AgentSessionResponse_ToolCallRequest) GetInput() string {
-	if x != nil {
-		return x.Input
-	}
-	return ""
-}
-
-func (x *AgentSessionResponse_ToolCallRequest) GetTimeoutSeconds() int32 {
-	if x != nil {
-		return x.TimeoutSeconds
-	}
-	return 0
-}
-
 // Session-level error (e.g., invalid tool requested, session error)
 type AgentSessionResponse_Error struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1262,7 +1159,7 @@ type AgentSessionResponse_Error struct {
 
 func (x *AgentSessionResponse_Error) Reset() {
 	*x = AgentSessionResponse_Error{}
-	mi := &file_brain_v1_server_proto_msgTypes[17]
+	mi := &file_brain_v1_server_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1274,7 +1171,7 @@ func (x *AgentSessionResponse_Error) String() string {
 func (*AgentSessionResponse_Error) ProtoMessage() {}
 
 func (x *AgentSessionResponse_Error) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[17]
+	mi := &file_brain_v1_server_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1287,7 +1184,7 @@ func (x *AgentSessionResponse_Error) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AgentSessionResponse_Error.ProtoReflect.Descriptor instead.
 func (*AgentSessionResponse_Error) Descriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 2}
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 0}
 }
 
 func (x *AgentSessionResponse_Error) GetCode() string {
@@ -1321,7 +1218,7 @@ type AgentSessionResponse_HeartbeatAck struct {
 
 func (x *AgentSessionResponse_HeartbeatAck) Reset() {
 	*x = AgentSessionResponse_HeartbeatAck{}
-	mi := &file_brain_v1_server_proto_msgTypes[18]
+	mi := &file_brain_v1_server_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1333,7 +1230,7 @@ func (x *AgentSessionResponse_HeartbeatAck) String() string {
 func (*AgentSessionResponse_HeartbeatAck) ProtoMessage() {}
 
 func (x *AgentSessionResponse_HeartbeatAck) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[18]
+	mi := &file_brain_v1_server_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1346,7 +1243,7 @@ func (x *AgentSessionResponse_HeartbeatAck) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use AgentSessionResponse_HeartbeatAck.ProtoReflect.Descriptor instead.
 func (*AgentSessionResponse_HeartbeatAck) Descriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 3}
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 1}
 }
 
 func (x *AgentSessionResponse_HeartbeatAck) GetTimestamp() int64 {
@@ -1366,7 +1263,7 @@ type AgentSessionResponse_SessionEndAck struct {
 
 func (x *AgentSessionResponse_SessionEndAck) Reset() {
 	*x = AgentSessionResponse_SessionEndAck{}
-	mi := &file_brain_v1_server_proto_msgTypes[19]
+	mi := &file_brain_v1_server_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1378,7 +1275,7 @@ func (x *AgentSessionResponse_SessionEndAck) String() string {
 func (*AgentSessionResponse_SessionEndAck) ProtoMessage() {}
 
 func (x *AgentSessionResponse_SessionEndAck) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[19]
+	mi := &file_brain_v1_server_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1391,7 +1288,7 @@ func (x *AgentSessionResponse_SessionEndAck) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use AgentSessionResponse_SessionEndAck.ProtoReflect.Descriptor instead.
 func (*AgentSessionResponse_SessionEndAck) Descriptor() ([]byte, []int) {
-	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 4}
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 2}
 }
 
 func (x *AgentSessionResponse_SessionEndAck) GetAcknowledged() bool {
@@ -1399,6 +1296,111 @@ func (x *AgentSessionResponse_SessionEndAck) GetAcknowledged() bool {
 		return x.Acknowledged
 	}
 	return false
+}
+
+type AgentSessionResponse_ToolCallRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RequestId     string                 `protobuf:"bytes,1,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	ToolName      string                 `protobuf:"bytes,2,opt,name=tool_name,json=toolName,proto3" json:"tool_name,omitempty"`
+	Input         string                 `protobuf:"bytes,3,opt,name=input,proto3" json:"input,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AgentSessionResponse_ToolCallRequest) Reset() {
+	*x = AgentSessionResponse_ToolCallRequest{}
+	mi := &file_brain_v1_server_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AgentSessionResponse_ToolCallRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AgentSessionResponse_ToolCallRequest) ProtoMessage() {}
+
+func (x *AgentSessionResponse_ToolCallRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AgentSessionResponse_ToolCallRequest.ProtoReflect.Descriptor instead.
+func (*AgentSessionResponse_ToolCallRequest) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 3}
+}
+
+func (x *AgentSessionResponse_ToolCallRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
+func (x *AgentSessionResponse_ToolCallRequest) GetToolName() string {
+	if x != nil {
+		return x.ToolName
+	}
+	return ""
+}
+
+func (x *AgentSessionResponse_ToolCallRequest) GetInput() string {
+	if x != nil {
+		return x.Input
+	}
+	return ""
+}
+
+// Response with generated content from the agent
+type AgentSessionResponse_RunResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Content       string                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AgentSessionResponse_RunResponse) Reset() {
+	*x = AgentSessionResponse_RunResponse{}
+	mi := &file_brain_v1_server_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AgentSessionResponse_RunResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AgentSessionResponse_RunResponse) ProtoMessage() {}
+
+func (x *AgentSessionResponse_RunResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AgentSessionResponse_RunResponse.ProtoReflect.Descriptor instead.
+func (*AgentSessionResponse_RunResponse) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{7, 4}
+}
+
+func (x *AgentSessionResponse_RunResponse) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
 }
 
 var File_brain_v1_server_proto protoreflect.FileDescriptor
@@ -1442,10 +1444,10 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\bcategory\x18\x02 \x01(\tR\bcategory\x12\x1c\n" +
 	"\treasoning\x18\x03 \x01(\tR\treasoning\x12)\n" +
 	"\x10confidence_score\x18\x04 \x01(\x02R\x0fconfidenceScore\x12\x12\n" +
-	"\x04tags\x18\x05 \x03(\tR\x04tags\"\x8c\n" +
-	"\n" +
-	"\x13AgentSessionRequest\x12G\n" +
-	"\thandshake\x18\x01 \x01(\v2'.brain.v1.AgentSessionRequest.HandshakeH\x00R\thandshake\x12^\n" +
+	"\x04tags\x18\x05 \x03(\tR\x04tags\"\xd5\t\n" +
+	"\x13AgentSessionRequest\x12K\n" +
+	"\vrun_request\x18\x01 \x01(\v2(.brain.v1.AgentSessionRequest.RunRequestH\x00R\n" +
+	"runRequest\x12^\n" +
 	"\x12tool_call_response\x18\x02 \x01(\v2..brain.v1.AgentSessionRequest.ToolCallResponseH\x00R\x10toolCallResponse\x12G\n" +
 	"\theartbeat\x18\x03 \x01(\v2'.brain.v1.AgentSessionRequest.HeartbeatH\x00R\theartbeat\x12K\n" +
 	"\vsession_end\x18\x04 \x01(\v2(.brain.v1.AgentSessionRequest.SessionEndH\x00R\n" +
@@ -1459,15 +1461,14 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12!\n" +
 	"\finput_schema\x18\x03 \x01(\tR\vinputSchema\x12#\n" +
-	"\routput_schema\x18\x04 \x01(\tR\foutputSchema\x1a\xf7\x01\n" +
-	"\tHandshake\x12\x1d\n" +
+	"\routput_schema\x18\x04 \x01(\tR\foutputSchema\x1a,\n" +
+	"\x12TerminateExecution\x12\x16\n" +
+	"\x06reason\x18\x01 \x01(\tR\x06reason\x1a\x8e\x01\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12;\n" +
-	"\x06agents\x18\x02 \x03(\v2#.brain.v1.AgentSessionRequest.AgentR\x06agents\x12Q\n" +
-	"\bmetadata\x18\x03 \x03(\v25.brain.v1.AgentSessionRequest.Handshake.MetadataEntryR\bmetadata\x1a;\n" +
-	"\rMetadataEntry\x12\x10\n" +
-	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a\xb6\x02\n" +
+	"RunRequest\x12 \n" +
+	"\vinstruction\x18\x01 \x01(\tR\vinstruction\x12;\n" +
+	"\x06agents\x18\x02 \x03(\v2#.brain.v1.AgentSessionRequest.AgentR\x06agents\x12!\n" +
+	"\fuser_message\x18\x03 \x01(\tR\vuserMessage\x1a\xb6\x02\n" +
 	"\x10ToolCallResponse\x12\x1d\n" +
 	"\n" +
 	"request_id\x18\x01 \x01(\tR\trequestId\x12M\n" +
@@ -1485,27 +1486,13 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\n" +
 	"SessionEnd\x12\x16\n" +
 	"\x06reason\x18\x01 \x01(\tR\x06reasonB\t\n" +
-	"\amessage\"\x9e\b\n" +
-	"\x14AgentSessionResponse\x12R\n" +
-	"\rhandshake_ack\x18\x01 \x01(\v2+.brain.v1.AgentSessionResponse.HandshakeAckH\x00R\fhandshakeAck\x12\\\n" +
+	"\amessage\"\xec\x06\n" +
+	"\x14AgentSessionResponse\x12O\n" +
+	"\frun_response\x18\x01 \x01(\v2*.brain.v1.AgentSessionResponse.RunResponseH\x00R\vrunResponse\x12\\\n" +
 	"\x11tool_call_request\x18\x02 \x01(\v2..brain.v1.AgentSessionResponse.ToolCallRequestH\x00R\x0ftoolCallRequest\x12<\n" +
 	"\x05error\x18\x03 \x01(\v2$.brain.v1.AgentSessionResponse.ErrorH\x00R\x05error\x12R\n" +
 	"\rheartbeat_ack\x18\x04 \x01(\v2+.brain.v1.AgentSessionResponse.HeartbeatAckH\x00R\fheartbeatAck\x12V\n" +
-	"\x0fsession_end_ack\x18\x05 \x01(\v2,.brain.v1.AgentSessionResponse.SessionEndAckH\x00R\rsessionEndAck\x1a\x8c\x01\n" +
-	"\fHandshakeAck\x12\x1d\n" +
-	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x1a\n" +
-	"\baccepted\x18\x02 \x01(\bR\baccepted\x12+\n" +
-	"\x11registered_agents\x18\x03 \x03(\tR\x10registeredAgents\x12\x14\n" +
-	"\x05error\x18\x04 \x01(\tR\x05error\x1a\xab\x01\n" +
-	"\x0fToolCallRequest\x12\x1d\n" +
-	"\n" +
-	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1d\n" +
-	"\n" +
-	"agent_name\x18\x02 \x01(\tR\tagentName\x12\x1b\n" +
-	"\ttool_name\x18\x03 \x01(\tR\btoolName\x12\x14\n" +
-	"\x05input\x18\x04 \x01(\tR\x05input\x12'\n" +
-	"\x0ftimeout_seconds\x18\x05 \x01(\x05R\x0etimeoutSeconds\x1a\xbe\x01\n" +
+	"\x0fsession_end_ack\x18\x05 \x01(\v2,.brain.v1.AgentSessionResponse.SessionEndAckH\x00R\rsessionEndAck\x1a\xbe\x01\n" +
 	"\x05Error\x12\x12\n" +
 	"\x04code\x18\x01 \x01(\tR\x04code\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12K\n" +
@@ -1516,7 +1503,14 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\fHeartbeatAck\x12\x1c\n" +
 	"\ttimestamp\x18\x01 \x01(\x03R\ttimestamp\x1a3\n" +
 	"\rSessionEndAck\x12\"\n" +
-	"\facknowledged\x18\x01 \x01(\bR\facknowledgedB\t\n" +
+	"\facknowledged\x18\x01 \x01(\bR\facknowledged\x1ac\n" +
+	"\x0fToolCallRequest\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x01 \x01(\tR\trequestId\x12\x1b\n" +
+	"\ttool_name\x18\x02 \x01(\tR\btoolName\x12\x14\n" +
+	"\x05input\x18\x03 \x01(\tR\x05input\x1a'\n" +
+	"\vRunResponse\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\tR\acontentB\t\n" +
 	"\amessage2\xf5\x02\n" +
 	"\fBrainService\x12V\n" +
 	"\x0fDeviceHandshake\x12 .brain.v1.DeviceHandshakeRequest\x1a!.brain.v1.DeviceHandshakeResponse\x12b\n" +
@@ -1549,47 +1543,46 @@ var file_brain_v1_server_proto_goTypes = []any{
 	(*AgentSessionRequest)(nil),                      // 7: brain.v1.AgentSessionRequest
 	(*AgentSessionResponse)(nil),                     // 8: brain.v1.AgentSessionResponse
 	(*AgentSessionRequest_Agent)(nil),                // 9: brain.v1.AgentSessionRequest.Agent
-	(*AgentSessionRequest_Handshake)(nil),            // 10: brain.v1.AgentSessionRequest.Handshake
-	(*AgentSessionRequest_ToolCallResponse)(nil),     // 11: brain.v1.AgentSessionRequest.ToolCallResponse
-	(*AgentSessionRequest_Heartbeat)(nil),            // 12: brain.v1.AgentSessionRequest.Heartbeat
-	(*AgentSessionRequest_SessionEnd)(nil),           // 13: brain.v1.AgentSessionRequest.SessionEnd
-	(*AgentSessionRequest_Agent_Tool)(nil),           // 14: brain.v1.AgentSessionRequest.Agent.Tool
-	nil,                                              // 15: brain.v1.AgentSessionRequest.Handshake.MetadataEntry
-	(*AgentSessionResponse_HandshakeAck)(nil),        // 16: brain.v1.AgentSessionResponse.HandshakeAck
-	(*AgentSessionResponse_ToolCallRequest)(nil),     // 17: brain.v1.AgentSessionResponse.ToolCallRequest
-	(*AgentSessionResponse_Error)(nil),               // 18: brain.v1.AgentSessionResponse.Error
-	(*AgentSessionResponse_HeartbeatAck)(nil),        // 19: brain.v1.AgentSessionResponse.HeartbeatAck
-	(*AgentSessionResponse_SessionEndAck)(nil),       // 20: brain.v1.AgentSessionResponse.SessionEndAck
-	nil, // 21: brain.v1.AgentSessionResponse.Error.DetailsEntry
+	(*AgentSessionRequest_TerminateExecution)(nil),   // 10: brain.v1.AgentSessionRequest.TerminateExecution
+	(*AgentSessionRequest_RunRequest)(nil),           // 11: brain.v1.AgentSessionRequest.RunRequest
+	(*AgentSessionRequest_ToolCallResponse)(nil),     // 12: brain.v1.AgentSessionRequest.ToolCallResponse
+	(*AgentSessionRequest_Heartbeat)(nil),            // 13: brain.v1.AgentSessionRequest.Heartbeat
+	(*AgentSessionRequest_SessionEnd)(nil),           // 14: brain.v1.AgentSessionRequest.SessionEnd
+	(*AgentSessionRequest_Agent_Tool)(nil),           // 15: brain.v1.AgentSessionRequest.Agent.Tool
+	(*AgentSessionResponse_Error)(nil),               // 16: brain.v1.AgentSessionResponse.Error
+	(*AgentSessionResponse_HeartbeatAck)(nil),        // 17: brain.v1.AgentSessionResponse.HeartbeatAck
+	(*AgentSessionResponse_SessionEndAck)(nil),       // 18: brain.v1.AgentSessionResponse.SessionEndAck
+	(*AgentSessionResponse_ToolCallRequest)(nil),     // 19: brain.v1.AgentSessionResponse.ToolCallRequest
+	(*AgentSessionResponse_RunResponse)(nil),         // 20: brain.v1.AgentSessionResponse.RunResponse
+	nil,                                              // 21: brain.v1.AgentSessionResponse.Error.DetailsEntry
 }
 var file_brain_v1_server_proto_depIdxs = []int32{
-	10, // 0: brain.v1.AgentSessionRequest.handshake:type_name -> brain.v1.AgentSessionRequest.Handshake
-	11, // 1: brain.v1.AgentSessionRequest.tool_call_response:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse
-	12, // 2: brain.v1.AgentSessionRequest.heartbeat:type_name -> brain.v1.AgentSessionRequest.Heartbeat
-	13, // 3: brain.v1.AgentSessionRequest.session_end:type_name -> brain.v1.AgentSessionRequest.SessionEnd
-	16, // 4: brain.v1.AgentSessionResponse.handshake_ack:type_name -> brain.v1.AgentSessionResponse.HandshakeAck
-	17, // 5: brain.v1.AgentSessionResponse.tool_call_request:type_name -> brain.v1.AgentSessionResponse.ToolCallRequest
-	18, // 6: brain.v1.AgentSessionResponse.error:type_name -> brain.v1.AgentSessionResponse.Error
-	19, // 7: brain.v1.AgentSessionResponse.heartbeat_ack:type_name -> brain.v1.AgentSessionResponse.HeartbeatAck
-	20, // 8: brain.v1.AgentSessionResponse.session_end_ack:type_name -> brain.v1.AgentSessionResponse.SessionEndAck
-	14, // 9: brain.v1.AgentSessionRequest.Agent.tools:type_name -> brain.v1.AgentSessionRequest.Agent.Tool
-	9,  // 10: brain.v1.AgentSessionRequest.Handshake.agents:type_name -> brain.v1.AgentSessionRequest.Agent
-	15, // 11: brain.v1.AgentSessionRequest.Handshake.metadata:type_name -> brain.v1.AgentSessionRequest.Handshake.MetadataEntry
-	0,  // 12: brain.v1.AgentSessionRequest.ToolCallResponse.status:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse.Status
-	21, // 13: brain.v1.AgentSessionResponse.Error.details:type_name -> brain.v1.AgentSessionResponse.Error.DetailsEntry
-	1,  // 14: brain.v1.BrainService.DeviceHandshake:input_type -> brain.v1.DeviceHandshakeRequest
-	3,  // 15: brain.v1.BrainService.ClassifyApplication:input_type -> brain.v1.ClassifyApplicationRequest
-	5,  // 16: brain.v1.BrainService.ClassifyWebsite:input_type -> brain.v1.ClassifyWebsiteRequest
-	7,  // 17: brain.v1.BrainService.AgentSession:input_type -> brain.v1.AgentSessionRequest
-	2,  // 18: brain.v1.BrainService.DeviceHandshake:output_type -> brain.v1.DeviceHandshakeResponse
-	4,  // 19: brain.v1.BrainService.ClassifyApplication:output_type -> brain.v1.ClassifyApplicationResponse
-	6,  // 20: brain.v1.BrainService.ClassifyWebsite:output_type -> brain.v1.ClassifyWebsiteResponse
-	8,  // 21: brain.v1.BrainService.AgentSession:output_type -> brain.v1.AgentSessionResponse
-	18, // [18:22] is the sub-list for method output_type
-	14, // [14:18] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	11, // 0: brain.v1.AgentSessionRequest.run_request:type_name -> brain.v1.AgentSessionRequest.RunRequest
+	12, // 1: brain.v1.AgentSessionRequest.tool_call_response:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse
+	13, // 2: brain.v1.AgentSessionRequest.heartbeat:type_name -> brain.v1.AgentSessionRequest.Heartbeat
+	14, // 3: brain.v1.AgentSessionRequest.session_end:type_name -> brain.v1.AgentSessionRequest.SessionEnd
+	20, // 4: brain.v1.AgentSessionResponse.run_response:type_name -> brain.v1.AgentSessionResponse.RunResponse
+	19, // 5: brain.v1.AgentSessionResponse.tool_call_request:type_name -> brain.v1.AgentSessionResponse.ToolCallRequest
+	16, // 6: brain.v1.AgentSessionResponse.error:type_name -> brain.v1.AgentSessionResponse.Error
+	17, // 7: brain.v1.AgentSessionResponse.heartbeat_ack:type_name -> brain.v1.AgentSessionResponse.HeartbeatAck
+	18, // 8: brain.v1.AgentSessionResponse.session_end_ack:type_name -> brain.v1.AgentSessionResponse.SessionEndAck
+	15, // 9: brain.v1.AgentSessionRequest.Agent.tools:type_name -> brain.v1.AgentSessionRequest.Agent.Tool
+	9,  // 10: brain.v1.AgentSessionRequest.RunRequest.agents:type_name -> brain.v1.AgentSessionRequest.Agent
+	0,  // 11: brain.v1.AgentSessionRequest.ToolCallResponse.status:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse.Status
+	21, // 12: brain.v1.AgentSessionResponse.Error.details:type_name -> brain.v1.AgentSessionResponse.Error.DetailsEntry
+	1,  // 13: brain.v1.BrainService.DeviceHandshake:input_type -> brain.v1.DeviceHandshakeRequest
+	3,  // 14: brain.v1.BrainService.ClassifyApplication:input_type -> brain.v1.ClassifyApplicationRequest
+	5,  // 15: brain.v1.BrainService.ClassifyWebsite:input_type -> brain.v1.ClassifyWebsiteRequest
+	7,  // 16: brain.v1.BrainService.AgentSession:input_type -> brain.v1.AgentSessionRequest
+	2,  // 17: brain.v1.BrainService.DeviceHandshake:output_type -> brain.v1.DeviceHandshakeResponse
+	4,  // 18: brain.v1.BrainService.ClassifyApplication:output_type -> brain.v1.ClassifyApplicationResponse
+	6,  // 19: brain.v1.BrainService.ClassifyWebsite:output_type -> brain.v1.ClassifyWebsiteResponse
+	8,  // 20: brain.v1.BrainService.AgentSession:output_type -> brain.v1.AgentSessionResponse
+	17, // [17:21] is the sub-list for method output_type
+	13, // [13:17] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_brain_v1_server_proto_init() }
@@ -1599,13 +1592,13 @@ func file_brain_v1_server_proto_init() {
 	}
 	file_brain_v1_server_proto_msgTypes[3].OneofWrappers = []any{}
 	file_brain_v1_server_proto_msgTypes[6].OneofWrappers = []any{
-		(*AgentSessionRequest_Handshake_)(nil),
+		(*AgentSessionRequest_RunRequest_)(nil),
 		(*AgentSessionRequest_ToolCallResponse_)(nil),
 		(*AgentSessionRequest_Heartbeat_)(nil),
 		(*AgentSessionRequest_SessionEnd_)(nil),
 	}
 	file_brain_v1_server_proto_msgTypes[7].OneofWrappers = []any{
-		(*AgentSessionResponse_HandshakeAck_)(nil),
+		(*AgentSessionResponse_RunResponse_)(nil),
 		(*AgentSessionResponse_ToolCallRequest_)(nil),
 		(*AgentSessionResponse_Error_)(nil),
 		(*AgentSessionResponse_HeartbeatAck_)(nil),
