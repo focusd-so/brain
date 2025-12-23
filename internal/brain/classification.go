@@ -540,8 +540,8 @@ func (s *ServiceImpl) ClassifyWebsite(ctx context.Context, req *connect.Request[
 	}
 
 	// Add title from request or fetched metadata
-	if req.Msg.Title != nil && *req.Msg.Title != "" {
-		contextData["title"] = *req.Msg.Title
+	if req.Msg.Title != "" {
+		contextData["title"] = req.Msg.Title
 	} else if metadata.Title != "" {
 		contextData["title"] = metadata.Title
 	}

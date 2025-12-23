@@ -2,47 +2,194 @@ syntax = "proto3";
 
 package brain.v1;
 
-import "google/protobuf/empty.proto";
-
 option go_package = "github.com/focusd-so/brain/gen/brain/v1;brainv1";
 
 service BrainService {
+    // ---------------------------------------------------------
+    // AUTHENTICATION
+    // ---------------------------------------------------------
+    // Exchanges a Hardware Fingerprint for a PASETO Session Token.
+    // Note: Request requires HMAC Headers (X-Signature, X-Timestamp, X-Nonce).
     rpc DeviceHandshake(DeviceHandshakeRequest) returns (DeviceHandshakeResponse);
 
-
-    // classification
+    // ---------------------------------------------------------
+    // CLASSIFICATION
+    // ---------------------------------------------------------
+    // Analyze a specific app window to determine focus level.
     rpc ClassifyApplication(ClassifyApplicationRequest) returns (ClassifyApplicationResponse);
+    
+    // Analyze a URL (browser tab) to determine focus level.
     rpc ClassifyWebsite(ClassifyWebsiteRequest) returns (ClassifyWebsiteResponse);
+
+    // ---------------------------------------------------------
+    // INTELLIGENCE (AI AGENTS)
+    // ---------------------------------------------------------
+    rpc AgentSession(stream AgentSessionRequest) returns (stream AgentSessionResponse);
 }
+
+// =============================================================================
+// AUTH MESSAGES
+// =============================================================================
 
 message DeviceHandshakeRequest {
     string device_fingerprint = 1;
+    string os_platform = 2;       // e.g. "darwin", "windows" - for analytics
+    string os_version = 3;        // e.g. "14.2.1"
+    string app_version = 4;       // e.g. "1.0.4" - allows force-update checks
 }
 
 message DeviceHandshakeResponse {
-    string token = 1;
+    string session_token = 1;     // The PASETO v2.local token
+    int64 expires_at = 2;         // Unix timestamp (hint for client refresh)
+    
+    // Limits / Account Status
+    string account_role = 3;      // "anonymous", "pro"
+    int32 remaining_daily_scans = 4; // If anonymous
 }
 
+// =============================================================================
+// CLASSIFICATION MESSAGES
+// =============================================================================
+
 message ClassifyApplicationRequest {
-    string application_name = 1;
-    string application_bundle_id = 2;
-    string window_title = 3;
+    string application_name = 1;  // "Visual Studio Code"
+    string application_bundle_id = 2; // "com.microsoft.VSCode"
+    string window_title = 3;      // "main.go - focusd"
 }
 
 message ClassifyApplicationResponse {
-    string classification = 1;          // productive, supporting, neutral, distracting
-    string reasoning = 2;               // Brief explanation
-    repeated string tags = 3;           // work, research, code-editor, etc.
-    optional string detected_project = 4; // For code editors only
+    string classification = 1;
+    string category = 2;          
+    string reasoning = 3;         
+    float confidence_score = 4;   // 0.0 to 1.0 (How sure is the AI?)
+    repeated string tags = 5;
+    
+    // Metadata extraction (for Context correlation)
+    optional string detected_project = 6; // e.g. "focusd" extracted from title
+    optional string detected_file = 7;    // e.g. "main.go"
 }
 
 message ClassifyWebsiteRequest {
     string url = 1;
-    optional string title = 2;          // Page title if known
+    string title = 2;
 }
 
 message ClassifyWebsiteResponse {
-    string classification = 1;          // focused, supporting, neutral, distracting
-    string reasoning = 2;
-    repeated string tags = 3;
+    string classification = 1;
+    string category = 2;          // "Documentation", "Social", "Video"
+    string reasoning = 3;
+    float confidence_score = 4;   // 0.0 to 1.0 (How sure is the AI?)
+    repeated string tags = 5; 
+}
+
+// =============================================================================
+// INTELLIGENCE MESSAGES
+// =============================================================================
+
+message AgentSessionRequest {
+    // Agent and Tool definitions (sent during handshake from electron → brain)
+    message Agent {
+        message Tool {
+            string name = 1;
+            string description = 2;
+            // JSON Schema encoded as JSON string (can be unmarshalled into jsonschema)
+            string input_schema = 3;
+            string output_schema = 4;
+        }
+
+        string name = 1;
+        string description = 2;
+        string instruction = 3;
+        repeated Tool tools = 4;
+    }
+
+    // Initial handshake: electron declares all available agents and their tools
+    message Handshake {
+        string session_id = 1;            // Client-generated UUID for this session
+        repeated Agent agents = 2;
+        map<string, string> metadata = 3; // e.g., {"app_version": "1.0.0", "platform": "darwin"}
+    }
+
+    // Response to brain's tool call request
+    message ToolCallResponse {
+        string request_id = 1;            // Correlates to AgentSessionResponse.ToolCallRequest.request_id
+        
+        enum Status {
+            STATUS_UNSPECIFIED = 0;
+            STATUS_SUCCESS = 1;
+            STATUS_ERROR = 2;
+            STATUS_TIMEOUT = 3;
+        }
+        Status status = 2;
+        
+        // JSON-encoded output matching tool's output_schema (populated on success)
+        string output = 3;
+        
+        // Error message (populated on failure)
+        string error = 4;
+        
+        // Execution time in milliseconds (for monitoring/debugging)
+        int64 execution_time_ms = 5;
+    }
+
+    // Heartbeat to keep connection alive
+    message Heartbeat {
+        int64 timestamp = 1;
+    }
+
+    // Graceful session termination
+    message SessionEnd {
+        string reason = 1; // e.g., "user_requested", "error", "timeout"
+    }
+
+    oneof message {
+        Handshake handshake = 1;
+        ToolCallResponse tool_call_response = 2;
+        Heartbeat heartbeat = 3;
+        SessionEnd session_end = 4;
+    }
+}
+
+message AgentSessionResponse {
+    // Acknowledgment of handshake
+    message HandshakeAck {
+        string session_id = 1;
+        bool accepted = 2;
+        repeated string registered_agents = 3; // Confirms which agents were successfully registered
+        string error = 4;                      // Populated if not accepted
+    }
+
+    // Brain requests electron to execute a tool
+    message ToolCallRequest {
+        string request_id = 1;            // UUID to correlate with ToolCallResponse
+        string agent_name = 2;            // Which agent owns this tool
+        string tool_name = 3;             // Which tool to execute
+        string input = 4;                 // JSON-encoded input matching tool's input_schema
+        int32 timeout_seconds = 5;        // Optional: max execution time
+    }
+
+    // Session-level error (e.g., invalid tool requested, session error)
+    message Error {
+        string code = 1;    // e.g., "TOOL_NOT_FOUND", "SESSION_ERROR", "INVALID_INPUT"
+        string message = 2;
+        map<string, string> details = 3;
+    }
+
+    // Heartbeat acknowledgment
+    message HeartbeatAck {
+        int64 timestamp = 1;
+    }
+
+    // Session end acknowledgment
+    message SessionEndAck {
+        bool acknowledged = 1;
+    }
+
+    oneof message {
+        HandshakeAck handshake_ack = 1;
+        ToolCallRequest tool_call_request = 2;
+        Error error = 3;
+        HeartbeatAck heartbeat_ack = 4;
+        SessionEndAck session_end_ack = 5;
+    }
 }

@@ -42,14 +42,30 @@ const (
 	// BrainServiceClassifyWebsiteProcedure is the fully-qualified name of the BrainService's
 	// ClassifyWebsite RPC.
 	BrainServiceClassifyWebsiteProcedure = "/brain.v1.BrainService/ClassifyWebsite"
+	// BrainServiceAgentSessionProcedure is the fully-qualified name of the BrainService's AgentSession
+	// RPC.
+	BrainServiceAgentSessionProcedure = "/brain.v1.BrainService/AgentSession"
 )
 
 // BrainServiceClient is a client for the brain.v1.BrainService service.
 type BrainServiceClient interface {
+	// ---------------------------------------------------------
+	// AUTHENTICATION
+	// ---------------------------------------------------------
+	// Exchanges a Hardware Fingerprint for a PASETO Session Token.
+	// Note: Request requires HMAC Headers (X-Signature, X-Timestamp, X-Nonce).
 	DeviceHandshake(context.Context, *connect.Request[v1.DeviceHandshakeRequest]) (*connect.Response[v1.DeviceHandshakeResponse], error)
-	// classification
+	// ---------------------------------------------------------
+	// CLASSIFICATION
+	// ---------------------------------------------------------
+	// Analyze a specific app window to determine focus level.
 	ClassifyApplication(context.Context, *connect.Request[v1.ClassifyApplicationRequest]) (*connect.Response[v1.ClassifyApplicationResponse], error)
+	// Analyze a URL (browser tab) to determine focus level.
 	ClassifyWebsite(context.Context, *connect.Request[v1.ClassifyWebsiteRequest]) (*connect.Response[v1.ClassifyWebsiteResponse], error)
+	// ---------------------------------------------------------
+	// INTELLIGENCE (AI AGENTS)
+	// ---------------------------------------------------------
+	AgentSession(context.Context) *connect.BidiStreamForClient[v1.AgentSessionRequest, v1.AgentSessionResponse]
 }
 
 // NewBrainServiceClient constructs a client for the brain.v1.BrainService service. By default, it
@@ -81,6 +97,12 @@ func NewBrainServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(brainServiceMethods.ByName("ClassifyWebsite")),
 			connect.WithClientOptions(opts...),
 		),
+		agentSession: connect.NewClient[v1.AgentSessionRequest, v1.AgentSessionResponse](
+			httpClient,
+			baseURL+BrainServiceAgentSessionProcedure,
+			connect.WithSchema(brainServiceMethods.ByName("AgentSession")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -89,6 +111,7 @@ type brainServiceClient struct {
 	deviceHandshake     *connect.Client[v1.DeviceHandshakeRequest, v1.DeviceHandshakeResponse]
 	classifyApplication *connect.Client[v1.ClassifyApplicationRequest, v1.ClassifyApplicationResponse]
 	classifyWebsite     *connect.Client[v1.ClassifyWebsiteRequest, v1.ClassifyWebsiteResponse]
+	agentSession        *connect.Client[v1.AgentSessionRequest, v1.AgentSessionResponse]
 }
 
 // DeviceHandshake calls brain.v1.BrainService.DeviceHandshake.
@@ -106,12 +129,30 @@ func (c *brainServiceClient) ClassifyWebsite(ctx context.Context, req *connect.R
 	return c.classifyWebsite.CallUnary(ctx, req)
 }
 
+// AgentSession calls brain.v1.BrainService.AgentSession.
+func (c *brainServiceClient) AgentSession(ctx context.Context) *connect.BidiStreamForClient[v1.AgentSessionRequest, v1.AgentSessionResponse] {
+	return c.agentSession.CallBidiStream(ctx)
+}
+
 // BrainServiceHandler is an implementation of the brain.v1.BrainService service.
 type BrainServiceHandler interface {
+	// ---------------------------------------------------------
+	// AUTHENTICATION
+	// ---------------------------------------------------------
+	// Exchanges a Hardware Fingerprint for a PASETO Session Token.
+	// Note: Request requires HMAC Headers (X-Signature, X-Timestamp, X-Nonce).
 	DeviceHandshake(context.Context, *connect.Request[v1.DeviceHandshakeRequest]) (*connect.Response[v1.DeviceHandshakeResponse], error)
-	// classification
+	// ---------------------------------------------------------
+	// CLASSIFICATION
+	// ---------------------------------------------------------
+	// Analyze a specific app window to determine focus level.
 	ClassifyApplication(context.Context, *connect.Request[v1.ClassifyApplicationRequest]) (*connect.Response[v1.ClassifyApplicationResponse], error)
+	// Analyze a URL (browser tab) to determine focus level.
 	ClassifyWebsite(context.Context, *connect.Request[v1.ClassifyWebsiteRequest]) (*connect.Response[v1.ClassifyWebsiteResponse], error)
+	// ---------------------------------------------------------
+	// INTELLIGENCE (AI AGENTS)
+	// ---------------------------------------------------------
+	AgentSession(context.Context, *connect.BidiStream[v1.AgentSessionRequest, v1.AgentSessionResponse]) error
 }
 
 // NewBrainServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -139,6 +180,12 @@ func NewBrainServiceHandler(svc BrainServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(brainServiceMethods.ByName("ClassifyWebsite")),
 		connect.WithHandlerOptions(opts...),
 	)
+	brainServiceAgentSessionHandler := connect.NewBidiStreamHandler(
+		BrainServiceAgentSessionProcedure,
+		svc.AgentSession,
+		connect.WithSchema(brainServiceMethods.ByName("AgentSession")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/brain.v1.BrainService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BrainServiceDeviceHandshakeProcedure:
@@ -147,6 +194,8 @@ func NewBrainServiceHandler(svc BrainServiceHandler, opts ...connect.HandlerOpti
 			brainServiceClassifyApplicationHandler.ServeHTTP(w, r)
 		case BrainServiceClassifyWebsiteProcedure:
 			brainServiceClassifyWebsiteHandler.ServeHTTP(w, r)
+		case BrainServiceAgentSessionProcedure:
+			brainServiceAgentSessionHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -166,4 +215,8 @@ func (UnimplementedBrainServiceHandler) ClassifyApplication(context.Context, *co
 
 func (UnimplementedBrainServiceHandler) ClassifyWebsite(context.Context, *connect.Request[v1.ClassifyWebsiteRequest]) (*connect.Response[v1.ClassifyWebsiteResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.ClassifyWebsite is not implemented"))
+}
+
+func (UnimplementedBrainServiceHandler) AgentSession(context.Context, *connect.BidiStream[v1.AgentSessionRequest, v1.AgentSessionResponse]) error {
+	return connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.AgentSession is not implemented"))
 }
