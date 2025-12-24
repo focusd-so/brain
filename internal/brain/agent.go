@@ -109,7 +109,7 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 			}
 
 			slog.Info("AgentSession: creating function tool", "tool_name", t.GetName())
-			fntool, err := functiontool.New(fntoolcfg, func(ctx tool.Context, input map[string]any) (any, error) {
+			fntool, err := functiontool.New(fntoolcfg, func(ctx tool.Context, input map[string]any) (map[string]any, error) {
 				inputJSON, err := json.Marshal(input)
 				if err != nil {
 					return nil, fmt.Errorf("failed to marshal tool input: %w", err)
@@ -149,7 +149,16 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 						slog.Error("AgentSession: no tool call response received", "request_id", requestID)
 						return nil, fmt.Errorf("no tool call response received")
 					}
-					return response.GetOutput(), nil
+
+					slog.Info("AgentSession: received tool call response", "request_id", requestID, "response", response.GetOutput())
+
+					// return jsonschema
+					var output map[string]any
+					if err := json.Unmarshal([]byte(response.GetOutput()), &output); err != nil {
+						return nil, fmt.Errorf("failed to unmarshal tool call response: %w", err)
+					}
+
+					return output, nil
 				case <-time.After(3 * time.Minute):
 					// Clean up the channel on timeout
 					a.mu.Lock()
@@ -196,7 +205,7 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 				}
 
 				slog.Info("AgentSession: received tool call response",
-					"request_id", toolCallResponse.GetRequestId())
+					"request_id", toolCallResponse.GetRequestId(), "response", toolCallResponse.GetOutput())
 				a.toolCalls[toolCallResponse.GetRequestId()] <- toolCallResponse
 			case *brainv1.AgentSessionRequest_SessionEnd_:
 				slog.Info("AgentSession: session ended", "reason", message.GetSessionEnd().GetReason())
