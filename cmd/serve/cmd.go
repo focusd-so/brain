@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"time"
 
 	"connectrpc.com/connect"
 	"connectrpc.com/validate"
@@ -18,6 +19,11 @@ import (
 	"github.com/focusd-so/brain/internal/brain"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v3"
+
+	// 1. Add these imports for H2C support
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
+
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
@@ -44,10 +50,9 @@ var Command = &cli.Command{
 		},
 	},
 	Action: func(ctx context.Context, cmd *cli.Command) error {
-
 		err := godotenv.Load()
 		if err != nil {
-			log.Fatal("Error loading .env file")
+			log.Println("Warning: Error loading .env file")
 		}
 
 		url := cmd.String("turso-db-url")
@@ -78,13 +83,10 @@ var Command = &cli.Command{
 
 		// run EngineService as connect rpc handler
 		engineService := brain.NewServiceImpl(gormDB)
-		p := new(http.Protocols)
-		p.SetHTTP1(true)
 
 		mux := http.NewServeMux()
 		path, handler := brainv1connect.NewBrainServiceHandler(
 			engineService,
-			// Validation via Protovalidate is almost always recommended
 			connect.WithInterceptors(
 				auth.NewAuthInterceptor(),
 				validate.NewInterceptor(),
@@ -94,28 +96,40 @@ var Command = &cli.Command{
 
 		slog.Info("serving engine service at", "path", path)
 
-		// Use h2c so we can serve HTTP/2 without TLS.
-		p.SetUnencryptedHTTP2(true)
-		server := http.Server{
-			Addr:      cmd.String("addr"),
-			Protocols: p,
-			Handler:   mux,
+		// 2. CRITICAL FIX: Wrap the mux in h2c.NewHandler
+		// This forces the server to handle HTTP/2 requests over plaintext
+		h2Handler := h2c.NewHandler(mux, &http2.Server{})
+
+		server := &http.Server{
+			Addr:    cmd.String("addr"),
+			Handler: h2Handler, // Use the wrapped handler here
+			// ReadHeaderTimeout is recommended to prevent Slowloris attacks
+			ReadHeaderTimeout: 3 * time.Second,
 		}
 
 		sigint := make(chan os.Signal, 1)
 		signal.Notify(sigint, os.Interrupt)
 
 		go func() {
-			slog.Info("serving engine service")
-			if err := server.ListenAndServe(); err != nil {
+			slog.Info("serving engine service", "addr", cmd.String("addr"))
+			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				slog.Error("failed to serve engine service", "error", err)
+				os.Exit(1)
 			}
-			slog.Info("engine service shut down")
 		}()
 
 		<-sigint
 		slog.Info("shutting down engine service")
-		server.Shutdown(context.Background())
+
+		// Create a timeout context for shutdown
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			slog.Error("server forced to shutdown", "error", err)
+		}
+
+		slog.Info("engine service shut down")
 		return nil
 	},
 }
