@@ -14,7 +14,7 @@ import (
 	"connectrpc.com/connect"
 	"connectrpc.com/validate"
 	"github.com/focusd-so/brain/gen/brain/v1/brainv1connect"
-	"github.com/focusd-so/brain/gen/common"
+	commonv1 "github.com/focusd-so/brain/gen/common/v1"
 	"github.com/focusd-so/brain/internal/auth"
 	"github.com/focusd-so/brain/internal/brain"
 	"github.com/joho/godotenv"
@@ -77,7 +77,7 @@ var Command = &cli.Command{
 
 		slog.Info("connected to turso", "url", url)
 
-		if err := gormDB.AutoMigrate(&common.UserORM{}, &common.NonceORM{}, &common.PromptHistoryORM{}); err != nil {
+		if err := gormDB.AutoMigrate(&commonv1.UserORM{}, &commonv1.NonceORM{}, &commonv1.PromptHistoryORM{}); err != nil {
 			return fmt.Errorf("failed to auto migrate: %w", err)
 		}
 

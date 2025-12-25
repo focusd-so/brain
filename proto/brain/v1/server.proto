@@ -4,6 +4,9 @@ package brain.v1;
 
 option go_package = "github.com/focusd-so/brain/gen/brain/v1;brainv1";
 
+import "buf/validate/validate.proto";
+import "common/v1/common.proto";
+
 service BrainService {
     // ---------------------------------------------------------
     // AUTHENTICATION
@@ -25,6 +28,15 @@ service BrainService {
     // INTELLIGENCE (AI AGENTS)
     // ---------------------------------------------------------
     rpc AgentSession(stream AgentSessionRequest) returns (stream AgentSessionResponse);
+
+
+    // ---------------------------------------------------------
+    // OAUTH2 RELAY
+    // ---------------------------------------------------------
+    rpc OAuth2GetAuthorizationURL(OAuth2GetAuthorizationURLRequest) returns (OAuth2GetAuthorizationURLResponse);
+    rpc OAuth2ExchangeAuthorizationCode(OAuth2ExchangeAuthorizationCodeRequest) returns (OAuth2ExchangeAuthorizationCodeResponse);
+    rpc OAuth2RefreshAccessToken(OAuth2RefreshAccessTokenRequest) returns (OAuth2RefreshAccessTokenResponse);
+    rpc OAuth2RevokeAccessToken(OAuth2RevokeAccessTokenRequest) returns (OAuth2RevokeAccessTokenResponse);
 }
 
 // =============================================================================
@@ -189,4 +201,52 @@ message AgentSessionResponse {
         HeartbeatAck heartbeat_ack = 4;
         SessionEndAck session_end_ack = 5;
     }
+}
+
+message OAuth2GetAuthorizationURLRequest {
+    string provider = 1 [(buf.validate.field).string = { in: ["github", "slack", "jira", "google", "linear", "notion"] }]; 
+    string state = 2 [(buf.validate.field).string.min_len = 1];              
+    
+    // PKCE Fields (Critical for Desktop Security)
+    string code_challenge = 3 [(buf.validate.field).string.min_len = 1];     
+    string code_challenge_method = 4 [(buf.validate.field).string.min_len = 1]; 
+    
+    repeated string scopes = 5; // Optional
+}
+
+message OAuth2GetAuthorizationURLResponse {
+    string url = 1;                 // Full URL to open in system browser
+}
+
+message OAuth2ExchangeAuthorizationCodeRequest {
+    string provider = 1;            // "github"
+    string code = 2;                // The code received via Deep Link
+    string redirect_uri = 3;        // "focusd://callback"
+    
+    // PKCE Verification
+    // Sidecar sends the secret. Cloud verifies it against the Challenge 
+    // sent in Step 1 before completing the exchange.
+    string code_verifier = 4;       
+}
+
+message OAuth2ExchangeAuthorizationCodeResponse {
+    common.OAuth2Token token = 1;
+}
+
+message OAuth2RefreshAccessTokenRequest {
+    string provider = 1;
+    string refresh_token = 2;
+}
+
+message OAuth2RefreshAccessTokenResponse {
+    common.OAuth2Token token = 1;
+}
+
+message OAuth2RevokeAccessTokenRequest {
+    string provider = 1;
+    string token = 2; // Access or Refresh token
+}
+
+message OAuth2RevokeAccessTokenResponse {
+    bool success = 1;
 }

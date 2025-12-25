@@ -45,6 +45,18 @@ const (
 	// BrainServiceAgentSessionProcedure is the fully-qualified name of the BrainService's AgentSession
 	// RPC.
 	BrainServiceAgentSessionProcedure = "/brain.v1.BrainService/AgentSession"
+	// BrainServiceOAuth2GetAuthorizationURLProcedure is the fully-qualified name of the BrainService's
+	// OAuth2GetAuthorizationURL RPC.
+	BrainServiceOAuth2GetAuthorizationURLProcedure = "/brain.v1.BrainService/OAuth2GetAuthorizationURL"
+	// BrainServiceOAuth2ExchangeAuthorizationCodeProcedure is the fully-qualified name of the
+	// BrainService's OAuth2ExchangeAuthorizationCode RPC.
+	BrainServiceOAuth2ExchangeAuthorizationCodeProcedure = "/brain.v1.BrainService/OAuth2ExchangeAuthorizationCode"
+	// BrainServiceOAuth2RefreshAccessTokenProcedure is the fully-qualified name of the BrainService's
+	// OAuth2RefreshAccessToken RPC.
+	BrainServiceOAuth2RefreshAccessTokenProcedure = "/brain.v1.BrainService/OAuth2RefreshAccessToken"
+	// BrainServiceOAuth2RevokeAccessTokenProcedure is the fully-qualified name of the BrainService's
+	// OAuth2RevokeAccessToken RPC.
+	BrainServiceOAuth2RevokeAccessTokenProcedure = "/brain.v1.BrainService/OAuth2RevokeAccessToken"
 )
 
 // BrainServiceClient is a client for the brain.v1.BrainService service.
@@ -66,6 +78,13 @@ type BrainServiceClient interface {
 	// INTELLIGENCE (AI AGENTS)
 	// ---------------------------------------------------------
 	AgentSession(context.Context) *connect.BidiStreamForClient[v1.AgentSessionRequest, v1.AgentSessionResponse]
+	// ---------------------------------------------------------
+	// OAUTH2 RELAY
+	// ---------------------------------------------------------
+	OAuth2GetAuthorizationURL(context.Context, *connect.Request[v1.OAuth2GetAuthorizationURLRequest]) (*connect.Response[v1.OAuth2GetAuthorizationURLResponse], error)
+	OAuth2ExchangeAuthorizationCode(context.Context, *connect.Request[v1.OAuth2ExchangeAuthorizationCodeRequest]) (*connect.Response[v1.OAuth2ExchangeAuthorizationCodeResponse], error)
+	OAuth2RefreshAccessToken(context.Context, *connect.Request[v1.OAuth2RefreshAccessTokenRequest]) (*connect.Response[v1.OAuth2RefreshAccessTokenResponse], error)
+	OAuth2RevokeAccessToken(context.Context, *connect.Request[v1.OAuth2RevokeAccessTokenRequest]) (*connect.Response[v1.OAuth2RevokeAccessTokenResponse], error)
 }
 
 // NewBrainServiceClient constructs a client for the brain.v1.BrainService service. By default, it
@@ -103,15 +122,43 @@ func NewBrainServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 			connect.WithSchema(brainServiceMethods.ByName("AgentSession")),
 			connect.WithClientOptions(opts...),
 		),
+		oAuth2GetAuthorizationURL: connect.NewClient[v1.OAuth2GetAuthorizationURLRequest, v1.OAuth2GetAuthorizationURLResponse](
+			httpClient,
+			baseURL+BrainServiceOAuth2GetAuthorizationURLProcedure,
+			connect.WithSchema(brainServiceMethods.ByName("OAuth2GetAuthorizationURL")),
+			connect.WithClientOptions(opts...),
+		),
+		oAuth2ExchangeAuthorizationCode: connect.NewClient[v1.OAuth2ExchangeAuthorizationCodeRequest, v1.OAuth2ExchangeAuthorizationCodeResponse](
+			httpClient,
+			baseURL+BrainServiceOAuth2ExchangeAuthorizationCodeProcedure,
+			connect.WithSchema(brainServiceMethods.ByName("OAuth2ExchangeAuthorizationCode")),
+			connect.WithClientOptions(opts...),
+		),
+		oAuth2RefreshAccessToken: connect.NewClient[v1.OAuth2RefreshAccessTokenRequest, v1.OAuth2RefreshAccessTokenResponse](
+			httpClient,
+			baseURL+BrainServiceOAuth2RefreshAccessTokenProcedure,
+			connect.WithSchema(brainServiceMethods.ByName("OAuth2RefreshAccessToken")),
+			connect.WithClientOptions(opts...),
+		),
+		oAuth2RevokeAccessToken: connect.NewClient[v1.OAuth2RevokeAccessTokenRequest, v1.OAuth2RevokeAccessTokenResponse](
+			httpClient,
+			baseURL+BrainServiceOAuth2RevokeAccessTokenProcedure,
+			connect.WithSchema(brainServiceMethods.ByName("OAuth2RevokeAccessToken")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
 // brainServiceClient implements BrainServiceClient.
 type brainServiceClient struct {
-	deviceHandshake     *connect.Client[v1.DeviceHandshakeRequest, v1.DeviceHandshakeResponse]
-	classifyApplication *connect.Client[v1.ClassifyApplicationRequest, v1.ClassifyApplicationResponse]
-	classifyWebsite     *connect.Client[v1.ClassifyWebsiteRequest, v1.ClassifyWebsiteResponse]
-	agentSession        *connect.Client[v1.AgentSessionRequest, v1.AgentSessionResponse]
+	deviceHandshake                 *connect.Client[v1.DeviceHandshakeRequest, v1.DeviceHandshakeResponse]
+	classifyApplication             *connect.Client[v1.ClassifyApplicationRequest, v1.ClassifyApplicationResponse]
+	classifyWebsite                 *connect.Client[v1.ClassifyWebsiteRequest, v1.ClassifyWebsiteResponse]
+	agentSession                    *connect.Client[v1.AgentSessionRequest, v1.AgentSessionResponse]
+	oAuth2GetAuthorizationURL       *connect.Client[v1.OAuth2GetAuthorizationURLRequest, v1.OAuth2GetAuthorizationURLResponse]
+	oAuth2ExchangeAuthorizationCode *connect.Client[v1.OAuth2ExchangeAuthorizationCodeRequest, v1.OAuth2ExchangeAuthorizationCodeResponse]
+	oAuth2RefreshAccessToken        *connect.Client[v1.OAuth2RefreshAccessTokenRequest, v1.OAuth2RefreshAccessTokenResponse]
+	oAuth2RevokeAccessToken         *connect.Client[v1.OAuth2RevokeAccessTokenRequest, v1.OAuth2RevokeAccessTokenResponse]
 }
 
 // DeviceHandshake calls brain.v1.BrainService.DeviceHandshake.
@@ -134,6 +181,26 @@ func (c *brainServiceClient) AgentSession(ctx context.Context) *connect.BidiStre
 	return c.agentSession.CallBidiStream(ctx)
 }
 
+// OAuth2GetAuthorizationURL calls brain.v1.BrainService.OAuth2GetAuthorizationURL.
+func (c *brainServiceClient) OAuth2GetAuthorizationURL(ctx context.Context, req *connect.Request[v1.OAuth2GetAuthorizationURLRequest]) (*connect.Response[v1.OAuth2GetAuthorizationURLResponse], error) {
+	return c.oAuth2GetAuthorizationURL.CallUnary(ctx, req)
+}
+
+// OAuth2ExchangeAuthorizationCode calls brain.v1.BrainService.OAuth2ExchangeAuthorizationCode.
+func (c *brainServiceClient) OAuth2ExchangeAuthorizationCode(ctx context.Context, req *connect.Request[v1.OAuth2ExchangeAuthorizationCodeRequest]) (*connect.Response[v1.OAuth2ExchangeAuthorizationCodeResponse], error) {
+	return c.oAuth2ExchangeAuthorizationCode.CallUnary(ctx, req)
+}
+
+// OAuth2RefreshAccessToken calls brain.v1.BrainService.OAuth2RefreshAccessToken.
+func (c *brainServiceClient) OAuth2RefreshAccessToken(ctx context.Context, req *connect.Request[v1.OAuth2RefreshAccessTokenRequest]) (*connect.Response[v1.OAuth2RefreshAccessTokenResponse], error) {
+	return c.oAuth2RefreshAccessToken.CallUnary(ctx, req)
+}
+
+// OAuth2RevokeAccessToken calls brain.v1.BrainService.OAuth2RevokeAccessToken.
+func (c *brainServiceClient) OAuth2RevokeAccessToken(ctx context.Context, req *connect.Request[v1.OAuth2RevokeAccessTokenRequest]) (*connect.Response[v1.OAuth2RevokeAccessTokenResponse], error) {
+	return c.oAuth2RevokeAccessToken.CallUnary(ctx, req)
+}
+
 // BrainServiceHandler is an implementation of the brain.v1.BrainService service.
 type BrainServiceHandler interface {
 	// ---------------------------------------------------------
@@ -153,6 +220,13 @@ type BrainServiceHandler interface {
 	// INTELLIGENCE (AI AGENTS)
 	// ---------------------------------------------------------
 	AgentSession(context.Context, *connect.BidiStream[v1.AgentSessionRequest, v1.AgentSessionResponse]) error
+	// ---------------------------------------------------------
+	// OAUTH2 RELAY
+	// ---------------------------------------------------------
+	OAuth2GetAuthorizationURL(context.Context, *connect.Request[v1.OAuth2GetAuthorizationURLRequest]) (*connect.Response[v1.OAuth2GetAuthorizationURLResponse], error)
+	OAuth2ExchangeAuthorizationCode(context.Context, *connect.Request[v1.OAuth2ExchangeAuthorizationCodeRequest]) (*connect.Response[v1.OAuth2ExchangeAuthorizationCodeResponse], error)
+	OAuth2RefreshAccessToken(context.Context, *connect.Request[v1.OAuth2RefreshAccessTokenRequest]) (*connect.Response[v1.OAuth2RefreshAccessTokenResponse], error)
+	OAuth2RevokeAccessToken(context.Context, *connect.Request[v1.OAuth2RevokeAccessTokenRequest]) (*connect.Response[v1.OAuth2RevokeAccessTokenResponse], error)
 }
 
 // NewBrainServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -186,6 +260,30 @@ func NewBrainServiceHandler(svc BrainServiceHandler, opts ...connect.HandlerOpti
 		connect.WithSchema(brainServiceMethods.ByName("AgentSession")),
 		connect.WithHandlerOptions(opts...),
 	)
+	brainServiceOAuth2GetAuthorizationURLHandler := connect.NewUnaryHandler(
+		BrainServiceOAuth2GetAuthorizationURLProcedure,
+		svc.OAuth2GetAuthorizationURL,
+		connect.WithSchema(brainServiceMethods.ByName("OAuth2GetAuthorizationURL")),
+		connect.WithHandlerOptions(opts...),
+	)
+	brainServiceOAuth2ExchangeAuthorizationCodeHandler := connect.NewUnaryHandler(
+		BrainServiceOAuth2ExchangeAuthorizationCodeProcedure,
+		svc.OAuth2ExchangeAuthorizationCode,
+		connect.WithSchema(brainServiceMethods.ByName("OAuth2ExchangeAuthorizationCode")),
+		connect.WithHandlerOptions(opts...),
+	)
+	brainServiceOAuth2RefreshAccessTokenHandler := connect.NewUnaryHandler(
+		BrainServiceOAuth2RefreshAccessTokenProcedure,
+		svc.OAuth2RefreshAccessToken,
+		connect.WithSchema(brainServiceMethods.ByName("OAuth2RefreshAccessToken")),
+		connect.WithHandlerOptions(opts...),
+	)
+	brainServiceOAuth2RevokeAccessTokenHandler := connect.NewUnaryHandler(
+		BrainServiceOAuth2RevokeAccessTokenProcedure,
+		svc.OAuth2RevokeAccessToken,
+		connect.WithSchema(brainServiceMethods.ByName("OAuth2RevokeAccessToken")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/brain.v1.BrainService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case BrainServiceDeviceHandshakeProcedure:
@@ -196,6 +294,14 @@ func NewBrainServiceHandler(svc BrainServiceHandler, opts ...connect.HandlerOpti
 			brainServiceClassifyWebsiteHandler.ServeHTTP(w, r)
 		case BrainServiceAgentSessionProcedure:
 			brainServiceAgentSessionHandler.ServeHTTP(w, r)
+		case BrainServiceOAuth2GetAuthorizationURLProcedure:
+			brainServiceOAuth2GetAuthorizationURLHandler.ServeHTTP(w, r)
+		case BrainServiceOAuth2ExchangeAuthorizationCodeProcedure:
+			brainServiceOAuth2ExchangeAuthorizationCodeHandler.ServeHTTP(w, r)
+		case BrainServiceOAuth2RefreshAccessTokenProcedure:
+			brainServiceOAuth2RefreshAccessTokenHandler.ServeHTTP(w, r)
+		case BrainServiceOAuth2RevokeAccessTokenProcedure:
+			brainServiceOAuth2RevokeAccessTokenHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -219,4 +325,20 @@ func (UnimplementedBrainServiceHandler) ClassifyWebsite(context.Context, *connec
 
 func (UnimplementedBrainServiceHandler) AgentSession(context.Context, *connect.BidiStream[v1.AgentSessionRequest, v1.AgentSessionResponse]) error {
 	return connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.AgentSession is not implemented"))
+}
+
+func (UnimplementedBrainServiceHandler) OAuth2GetAuthorizationURL(context.Context, *connect.Request[v1.OAuth2GetAuthorizationURLRequest]) (*connect.Response[v1.OAuth2GetAuthorizationURLResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.OAuth2GetAuthorizationURL is not implemented"))
+}
+
+func (UnimplementedBrainServiceHandler) OAuth2ExchangeAuthorizationCode(context.Context, *connect.Request[v1.OAuth2ExchangeAuthorizationCodeRequest]) (*connect.Response[v1.OAuth2ExchangeAuthorizationCodeResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.OAuth2ExchangeAuthorizationCode is not implemented"))
+}
+
+func (UnimplementedBrainServiceHandler) OAuth2RefreshAccessToken(context.Context, *connect.Request[v1.OAuth2RefreshAccessTokenRequest]) (*connect.Response[v1.OAuth2RefreshAccessTokenResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.OAuth2RefreshAccessToken is not implemented"))
+}
+
+func (UnimplementedBrainServiceHandler) OAuth2RevokeAccessToken(context.Context, *connect.Request[v1.OAuth2RevokeAccessTokenRequest]) (*connect.Response[v1.OAuth2RevokeAccessTokenResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("brain.v1.BrainService.OAuth2RevokeAccessToken is not implemented"))
 }

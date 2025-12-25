@@ -12,7 +12,7 @@ import (
 
 	"connectrpc.com/connect"
 	brainv1 "github.com/focusd-so/brain/gen/brain/v1"
-	"github.com/focusd-so/brain/gen/common"
+	commonv1 "github.com/focusd-so/brain/gen/common/v1"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -24,7 +24,7 @@ func TestDeviceHandshake_HMACVerification(t *testing.T) {
 		t.Fatalf("failed to connect database: %v", err)
 	}
 	// Migrate common.Nonce if needed
-	if err := db.AutoMigrate(&common.Nonce{}); err != nil {
+	if err := db.AutoMigrate(&commonv1.NonceORM{}); err != nil {
 		t.Fatalf("failed to migrate: %v", err)
 	}
 

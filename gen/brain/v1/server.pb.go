@@ -7,6 +7,8 @@
 package brainv1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	v1 "github.com/focusd-so/brain/gen/common/v1"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -735,6 +737,434 @@ func (*AgentSessionResponse_HeartbeatAck_) isAgentSessionResponse_Message() {}
 
 func (*AgentSessionResponse_SessionEndAck_) isAgentSessionResponse_Message() {}
 
+type OAuth2GetAuthorizationURLRequest struct {
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	Provider string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	State    string                 `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
+	// PKCE Fields (Critical for Desktop Security)
+	CodeChallenge       string   `protobuf:"bytes,3,opt,name=code_challenge,json=codeChallenge,proto3" json:"code_challenge,omitempty"`
+	CodeChallengeMethod string   `protobuf:"bytes,4,opt,name=code_challenge_method,json=codeChallengeMethod,proto3" json:"code_challenge_method,omitempty"`
+	Scopes              []string `protobuf:"bytes,5,rep,name=scopes,proto3" json:"scopes,omitempty"` // Optional
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *OAuth2GetAuthorizationURLRequest) Reset() {
+	*x = OAuth2GetAuthorizationURLRequest{}
+	mi := &file_brain_v1_server_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2GetAuthorizationURLRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2GetAuthorizationURLRequest) ProtoMessage() {}
+
+func (x *OAuth2GetAuthorizationURLRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2GetAuthorizationURLRequest.ProtoReflect.Descriptor instead.
+func (*OAuth2GetAuthorizationURLRequest) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *OAuth2GetAuthorizationURLRequest) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *OAuth2GetAuthorizationURLRequest) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+func (x *OAuth2GetAuthorizationURLRequest) GetCodeChallenge() string {
+	if x != nil {
+		return x.CodeChallenge
+	}
+	return ""
+}
+
+func (x *OAuth2GetAuthorizationURLRequest) GetCodeChallengeMethod() string {
+	if x != nil {
+		return x.CodeChallengeMethod
+	}
+	return ""
+}
+
+func (x *OAuth2GetAuthorizationURLRequest) GetScopes() []string {
+	if x != nil {
+		return x.Scopes
+	}
+	return nil
+}
+
+type OAuth2GetAuthorizationURLResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Url           string                 `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"` // Full URL to open in system browser
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2GetAuthorizationURLResponse) Reset() {
+	*x = OAuth2GetAuthorizationURLResponse{}
+	mi := &file_brain_v1_server_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2GetAuthorizationURLResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2GetAuthorizationURLResponse) ProtoMessage() {}
+
+func (x *OAuth2GetAuthorizationURLResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2GetAuthorizationURLResponse.ProtoReflect.Descriptor instead.
+func (*OAuth2GetAuthorizationURLResponse) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *OAuth2GetAuthorizationURLResponse) GetUrl() string {
+	if x != nil {
+		return x.Url
+	}
+	return ""
+}
+
+type OAuth2ExchangeAuthorizationCodeRequest struct {
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Provider    string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`                          // "github"
+	Code        string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`                                  // The code received via Deep Link
+	RedirectUri string                 `protobuf:"bytes,3,opt,name=redirect_uri,json=redirectUri,proto3" json:"redirect_uri,omitempty"` // "focusd://callback"
+	// PKCE Verification
+	// Sidecar sends the secret. Cloud verifies it against the Challenge
+	// sent in Step 1 before completing the exchange.
+	CodeVerifier  string `protobuf:"bytes,4,opt,name=code_verifier,json=codeVerifier,proto3" json:"code_verifier,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeRequest) Reset() {
+	*x = OAuth2ExchangeAuthorizationCodeRequest{}
+	mi := &file_brain_v1_server_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2ExchangeAuthorizationCodeRequest) ProtoMessage() {}
+
+func (x *OAuth2ExchangeAuthorizationCodeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2ExchangeAuthorizationCodeRequest.ProtoReflect.Descriptor instead.
+func (*OAuth2ExchangeAuthorizationCodeRequest) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeRequest) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeRequest) GetRedirectUri() string {
+	if x != nil {
+		return x.RedirectUri
+	}
+	return ""
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeRequest) GetCodeVerifier() string {
+	if x != nil {
+		return x.CodeVerifier
+	}
+	return ""
+}
+
+type OAuth2ExchangeAuthorizationCodeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         *v1.OAuth2Token        `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeResponse) Reset() {
+	*x = OAuth2ExchangeAuthorizationCodeResponse{}
+	mi := &file_brain_v1_server_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2ExchangeAuthorizationCodeResponse) ProtoMessage() {}
+
+func (x *OAuth2ExchangeAuthorizationCodeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2ExchangeAuthorizationCodeResponse.ProtoReflect.Descriptor instead.
+func (*OAuth2ExchangeAuthorizationCodeResponse) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *OAuth2ExchangeAuthorizationCodeResponse) GetToken() *v1.OAuth2Token {
+	if x != nil {
+		return x.Token
+	}
+	return nil
+}
+
+type OAuth2RefreshAccessTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Provider      string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	RefreshToken  string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2RefreshAccessTokenRequest) Reset() {
+	*x = OAuth2RefreshAccessTokenRequest{}
+	mi := &file_brain_v1_server_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2RefreshAccessTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2RefreshAccessTokenRequest) ProtoMessage() {}
+
+func (x *OAuth2RefreshAccessTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2RefreshAccessTokenRequest.ProtoReflect.Descriptor instead.
+func (*OAuth2RefreshAccessTokenRequest) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *OAuth2RefreshAccessTokenRequest) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *OAuth2RefreshAccessTokenRequest) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+type OAuth2RefreshAccessTokenResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Token         *v1.OAuth2Token        `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2RefreshAccessTokenResponse) Reset() {
+	*x = OAuth2RefreshAccessTokenResponse{}
+	mi := &file_brain_v1_server_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2RefreshAccessTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2RefreshAccessTokenResponse) ProtoMessage() {}
+
+func (x *OAuth2RefreshAccessTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2RefreshAccessTokenResponse.ProtoReflect.Descriptor instead.
+func (*OAuth2RefreshAccessTokenResponse) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *OAuth2RefreshAccessTokenResponse) GetToken() *v1.OAuth2Token {
+	if x != nil {
+		return x.Token
+	}
+	return nil
+}
+
+type OAuth2RevokeAccessTokenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Provider      string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	Token         string                 `protobuf:"bytes,2,opt,name=token,proto3" json:"token,omitempty"` // Access or Refresh token
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2RevokeAccessTokenRequest) Reset() {
+	*x = OAuth2RevokeAccessTokenRequest{}
+	mi := &file_brain_v1_server_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2RevokeAccessTokenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2RevokeAccessTokenRequest) ProtoMessage() {}
+
+func (x *OAuth2RevokeAccessTokenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2RevokeAccessTokenRequest.ProtoReflect.Descriptor instead.
+func (*OAuth2RevokeAccessTokenRequest) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *OAuth2RevokeAccessTokenRequest) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *OAuth2RevokeAccessTokenRequest) GetToken() string {
+	if x != nil {
+		return x.Token
+	}
+	return ""
+}
+
+type OAuth2RevokeAccessTokenResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OAuth2RevokeAccessTokenResponse) Reset() {
+	*x = OAuth2RevokeAccessTokenResponse{}
+	mi := &file_brain_v1_server_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2RevokeAccessTokenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2RevokeAccessTokenResponse) ProtoMessage() {}
+
+func (x *OAuth2RevokeAccessTokenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_brain_v1_server_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2RevokeAccessTokenResponse.ProtoReflect.Descriptor instead.
+func (*OAuth2RevokeAccessTokenResponse) Descriptor() ([]byte, []int) {
+	return file_brain_v1_server_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *OAuth2RevokeAccessTokenResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
 // Agent and Tool definitions (sent during handshake from electron → brain)
 type AgentSessionRequest_Agent struct {
 	state         protoimpl.MessageState            `protogen:"open.v1"`
@@ -748,7 +1178,7 @@ type AgentSessionRequest_Agent struct {
 
 func (x *AgentSessionRequest_Agent) Reset() {
 	*x = AgentSessionRequest_Agent{}
-	mi := &file_brain_v1_server_proto_msgTypes[8]
+	mi := &file_brain_v1_server_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -760,7 +1190,7 @@ func (x *AgentSessionRequest_Agent) String() string {
 func (*AgentSessionRequest_Agent) ProtoMessage() {}
 
 func (x *AgentSessionRequest_Agent) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[8]
+	mi := &file_brain_v1_server_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -813,7 +1243,7 @@ type AgentSessionRequest_TerminateExecution struct {
 
 func (x *AgentSessionRequest_TerminateExecution) Reset() {
 	*x = AgentSessionRequest_TerminateExecution{}
-	mi := &file_brain_v1_server_proto_msgTypes[9]
+	mi := &file_brain_v1_server_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -825,7 +1255,7 @@ func (x *AgentSessionRequest_TerminateExecution) String() string {
 func (*AgentSessionRequest_TerminateExecution) ProtoMessage() {}
 
 func (x *AgentSessionRequest_TerminateExecution) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[9]
+	mi := &file_brain_v1_server_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -859,7 +1289,7 @@ type AgentSessionRequest_RunRequest struct {
 
 func (x *AgentSessionRequest_RunRequest) Reset() {
 	*x = AgentSessionRequest_RunRequest{}
-	mi := &file_brain_v1_server_proto_msgTypes[10]
+	mi := &file_brain_v1_server_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -871,7 +1301,7 @@ func (x *AgentSessionRequest_RunRequest) String() string {
 func (*AgentSessionRequest_RunRequest) ProtoMessage() {}
 
 func (x *AgentSessionRequest_RunRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[10]
+	mi := &file_brain_v1_server_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -925,7 +1355,7 @@ type AgentSessionRequest_ToolCallResponse struct {
 
 func (x *AgentSessionRequest_ToolCallResponse) Reset() {
 	*x = AgentSessionRequest_ToolCallResponse{}
-	mi := &file_brain_v1_server_proto_msgTypes[11]
+	mi := &file_brain_v1_server_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -937,7 +1367,7 @@ func (x *AgentSessionRequest_ToolCallResponse) String() string {
 func (*AgentSessionRequest_ToolCallResponse) ProtoMessage() {}
 
 func (x *AgentSessionRequest_ToolCallResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[11]
+	mi := &file_brain_v1_server_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -998,7 +1428,7 @@ type AgentSessionRequest_Heartbeat struct {
 
 func (x *AgentSessionRequest_Heartbeat) Reset() {
 	*x = AgentSessionRequest_Heartbeat{}
-	mi := &file_brain_v1_server_proto_msgTypes[12]
+	mi := &file_brain_v1_server_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1010,7 +1440,7 @@ func (x *AgentSessionRequest_Heartbeat) String() string {
 func (*AgentSessionRequest_Heartbeat) ProtoMessage() {}
 
 func (x *AgentSessionRequest_Heartbeat) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[12]
+	mi := &file_brain_v1_server_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1043,7 +1473,7 @@ type AgentSessionRequest_SessionEnd struct {
 
 func (x *AgentSessionRequest_SessionEnd) Reset() {
 	*x = AgentSessionRequest_SessionEnd{}
-	mi := &file_brain_v1_server_proto_msgTypes[13]
+	mi := &file_brain_v1_server_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1055,7 +1485,7 @@ func (x *AgentSessionRequest_SessionEnd) String() string {
 func (*AgentSessionRequest_SessionEnd) ProtoMessage() {}
 
 func (x *AgentSessionRequest_SessionEnd) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[13]
+	mi := &file_brain_v1_server_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1091,7 +1521,7 @@ type AgentSessionRequest_Agent_Tool struct {
 
 func (x *AgentSessionRequest_Agent_Tool) Reset() {
 	*x = AgentSessionRequest_Agent_Tool{}
-	mi := &file_brain_v1_server_proto_msgTypes[14]
+	mi := &file_brain_v1_server_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1103,7 +1533,7 @@ func (x *AgentSessionRequest_Agent_Tool) String() string {
 func (*AgentSessionRequest_Agent_Tool) ProtoMessage() {}
 
 func (x *AgentSessionRequest_Agent_Tool) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[14]
+	mi := &file_brain_v1_server_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1159,7 +1589,7 @@ type AgentSessionResponse_Error struct {
 
 func (x *AgentSessionResponse_Error) Reset() {
 	*x = AgentSessionResponse_Error{}
-	mi := &file_brain_v1_server_proto_msgTypes[15]
+	mi := &file_brain_v1_server_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1171,7 +1601,7 @@ func (x *AgentSessionResponse_Error) String() string {
 func (*AgentSessionResponse_Error) ProtoMessage() {}
 
 func (x *AgentSessionResponse_Error) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[15]
+	mi := &file_brain_v1_server_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1218,7 +1648,7 @@ type AgentSessionResponse_HeartbeatAck struct {
 
 func (x *AgentSessionResponse_HeartbeatAck) Reset() {
 	*x = AgentSessionResponse_HeartbeatAck{}
-	mi := &file_brain_v1_server_proto_msgTypes[16]
+	mi := &file_brain_v1_server_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1230,7 +1660,7 @@ func (x *AgentSessionResponse_HeartbeatAck) String() string {
 func (*AgentSessionResponse_HeartbeatAck) ProtoMessage() {}
 
 func (x *AgentSessionResponse_HeartbeatAck) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[16]
+	mi := &file_brain_v1_server_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1263,7 +1693,7 @@ type AgentSessionResponse_SessionEndAck struct {
 
 func (x *AgentSessionResponse_SessionEndAck) Reset() {
 	*x = AgentSessionResponse_SessionEndAck{}
-	mi := &file_brain_v1_server_proto_msgTypes[17]
+	mi := &file_brain_v1_server_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1275,7 +1705,7 @@ func (x *AgentSessionResponse_SessionEndAck) String() string {
 func (*AgentSessionResponse_SessionEndAck) ProtoMessage() {}
 
 func (x *AgentSessionResponse_SessionEndAck) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[17]
+	mi := &file_brain_v1_server_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1309,7 +1739,7 @@ type AgentSessionResponse_ToolCallRequest struct {
 
 func (x *AgentSessionResponse_ToolCallRequest) Reset() {
 	*x = AgentSessionResponse_ToolCallRequest{}
-	mi := &file_brain_v1_server_proto_msgTypes[18]
+	mi := &file_brain_v1_server_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1321,7 +1751,7 @@ func (x *AgentSessionResponse_ToolCallRequest) String() string {
 func (*AgentSessionResponse_ToolCallRequest) ProtoMessage() {}
 
 func (x *AgentSessionResponse_ToolCallRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[18]
+	mi := &file_brain_v1_server_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1368,7 +1798,7 @@ type AgentSessionResponse_RunResponse struct {
 
 func (x *AgentSessionResponse_RunResponse) Reset() {
 	*x = AgentSessionResponse_RunResponse{}
-	mi := &file_brain_v1_server_proto_msgTypes[19]
+	mi := &file_brain_v1_server_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1380,7 +1810,7 @@ func (x *AgentSessionResponse_RunResponse) String() string {
 func (*AgentSessionResponse_RunResponse) ProtoMessage() {}
 
 func (x *AgentSessionResponse_RunResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_brain_v1_server_proto_msgTypes[19]
+	mi := &file_brain_v1_server_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1407,7 +1837,7 @@ var File_brain_v1_server_proto protoreflect.FileDescriptor
 
 const file_brain_v1_server_proto_rawDesc = "" +
 	"\n" +
-	"\x15brain/v1/server.proto\x12\bbrain.v1\"\xa8\x01\n" +
+	"\x15brain/v1/server.proto\x12\bbrain.v1\x1a\x1bbuf/validate/validate.proto\x1a\x16common/v1/common.proto\"\xa8\x01\n" +
 	"\x16DeviceHandshakeRequest\x12-\n" +
 	"\x12device_fingerprint\x18\x01 \x01(\tR\x11deviceFingerprint\x12\x1f\n" +
 	"\vos_platform\x18\x02 \x01(\tR\n" +
@@ -1511,12 +1941,41 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\x05input\x18\x03 \x01(\tR\x05input\x1a'\n" +
 	"\vRunResponse\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\tR\acontentB\t\n" +
-	"\amessage2\xf5\x02\n" +
+	"\amessage\"\x96\x02\n" +
+	" OAuth2GetAuthorizationURLRequest\x12N\n" +
+	"\bprovider\x18\x01 \x01(\tB2\xbaH/r-R\x06githubR\x05slackR\x04jiraR\x06googleR\x06linearR\x06notionR\bprovider\x12\x1d\n" +
+	"\x05state\x18\x02 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x05state\x12.\n" +
+	"\x0ecode_challenge\x18\x03 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\rcodeChallenge\x12;\n" +
+	"\x15code_challenge_method\x18\x04 \x01(\tB\a\xbaH\x04r\x02\x10\x01R\x13codeChallengeMethod\x12\x16\n" +
+	"\x06scopes\x18\x05 \x03(\tR\x06scopes\"5\n" +
+	"!OAuth2GetAuthorizationURLResponse\x12\x10\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url\"\xa0\x01\n" +
+	"&OAuth2ExchangeAuthorizationCodeRequest\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12!\n" +
+	"\fredirect_uri\x18\x03 \x01(\tR\vredirectUri\x12#\n" +
+	"\rcode_verifier\x18\x04 \x01(\tR\fcodeVerifier\"T\n" +
+	"'OAuth2ExchangeAuthorizationCodeResponse\x12)\n" +
+	"\x05token\x18\x01 \x01(\v2\x13.common.OAuth2TokenR\x05token\"b\n" +
+	"\x1fOAuth2RefreshAccessTokenRequest\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\x12#\n" +
+	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\"M\n" +
+	" OAuth2RefreshAccessTokenResponse\x12)\n" +
+	"\x05token\x18\x01 \x01(\v2\x13.common.OAuth2TokenR\x05token\"R\n" +
+	"\x1eOAuth2RevokeAccessTokenRequest\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x14\n" +
+	"\x05token\x18\x02 \x01(\tR\x05token\";\n" +
+	"\x1fOAuth2RevokeAccessTokenResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess2\xd7\x06\n" +
 	"\fBrainService\x12V\n" +
 	"\x0fDeviceHandshake\x12 .brain.v1.DeviceHandshakeRequest\x1a!.brain.v1.DeviceHandshakeResponse\x12b\n" +
 	"\x13ClassifyApplication\x12$.brain.v1.ClassifyApplicationRequest\x1a%.brain.v1.ClassifyApplicationResponse\x12V\n" +
 	"\x0fClassifyWebsite\x12 .brain.v1.ClassifyWebsiteRequest\x1a!.brain.v1.ClassifyWebsiteResponse\x12Q\n" +
-	"\fAgentSession\x12\x1d.brain.v1.AgentSessionRequest\x1a\x1e.brain.v1.AgentSessionResponse(\x010\x01B1Z/github.com/focusd-so/brain/gen/brain/v1;brainv1b\x06proto3"
+	"\fAgentSession\x12\x1d.brain.v1.AgentSessionRequest\x1a\x1e.brain.v1.AgentSessionResponse(\x010\x01\x12t\n" +
+	"\x19OAuth2GetAuthorizationURL\x12*.brain.v1.OAuth2GetAuthorizationURLRequest\x1a+.brain.v1.OAuth2GetAuthorizationURLResponse\x12\x86\x01\n" +
+	"\x1fOAuth2ExchangeAuthorizationCode\x120.brain.v1.OAuth2ExchangeAuthorizationCodeRequest\x1a1.brain.v1.OAuth2ExchangeAuthorizationCodeResponse\x12q\n" +
+	"\x18OAuth2RefreshAccessToken\x12).brain.v1.OAuth2RefreshAccessTokenRequest\x1a*.brain.v1.OAuth2RefreshAccessTokenResponse\x12n\n" +
+	"\x17OAuth2RevokeAccessToken\x12(.brain.v1.OAuth2RevokeAccessTokenRequest\x1a).brain.v1.OAuth2RevokeAccessTokenResponseB1Z/github.com/focusd-so/brain/gen/brain/v1;brainv1b\x06proto3"
 
 var (
 	file_brain_v1_server_proto_rawDescOnce sync.Once
@@ -1531,7 +1990,7 @@ func file_brain_v1_server_proto_rawDescGZIP() []byte {
 }
 
 var file_brain_v1_server_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_brain_v1_server_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_brain_v1_server_proto_msgTypes = make([]protoimpl.MessageInfo, 29)
 var file_brain_v1_server_proto_goTypes = []any{
 	(AgentSessionRequest_ToolCallResponse_Status)(0), // 0: brain.v1.AgentSessionRequest.ToolCallResponse.Status
 	(*DeviceHandshakeRequest)(nil),                   // 1: brain.v1.DeviceHandshakeRequest
@@ -1542,47 +2001,66 @@ var file_brain_v1_server_proto_goTypes = []any{
 	(*ClassifyWebsiteResponse)(nil),                  // 6: brain.v1.ClassifyWebsiteResponse
 	(*AgentSessionRequest)(nil),                      // 7: brain.v1.AgentSessionRequest
 	(*AgentSessionResponse)(nil),                     // 8: brain.v1.AgentSessionResponse
-	(*AgentSessionRequest_Agent)(nil),                // 9: brain.v1.AgentSessionRequest.Agent
-	(*AgentSessionRequest_TerminateExecution)(nil),   // 10: brain.v1.AgentSessionRequest.TerminateExecution
-	(*AgentSessionRequest_RunRequest)(nil),           // 11: brain.v1.AgentSessionRequest.RunRequest
-	(*AgentSessionRequest_ToolCallResponse)(nil),     // 12: brain.v1.AgentSessionRequest.ToolCallResponse
-	(*AgentSessionRequest_Heartbeat)(nil),            // 13: brain.v1.AgentSessionRequest.Heartbeat
-	(*AgentSessionRequest_SessionEnd)(nil),           // 14: brain.v1.AgentSessionRequest.SessionEnd
-	(*AgentSessionRequest_Agent_Tool)(nil),           // 15: brain.v1.AgentSessionRequest.Agent.Tool
-	(*AgentSessionResponse_Error)(nil),               // 16: brain.v1.AgentSessionResponse.Error
-	(*AgentSessionResponse_HeartbeatAck)(nil),        // 17: brain.v1.AgentSessionResponse.HeartbeatAck
-	(*AgentSessionResponse_SessionEndAck)(nil),       // 18: brain.v1.AgentSessionResponse.SessionEndAck
-	(*AgentSessionResponse_ToolCallRequest)(nil),     // 19: brain.v1.AgentSessionResponse.ToolCallRequest
-	(*AgentSessionResponse_RunResponse)(nil),         // 20: brain.v1.AgentSessionResponse.RunResponse
-	nil,                                              // 21: brain.v1.AgentSessionResponse.Error.DetailsEntry
+	(*OAuth2GetAuthorizationURLRequest)(nil),         // 9: brain.v1.OAuth2GetAuthorizationURLRequest
+	(*OAuth2GetAuthorizationURLResponse)(nil),        // 10: brain.v1.OAuth2GetAuthorizationURLResponse
+	(*OAuth2ExchangeAuthorizationCodeRequest)(nil),   // 11: brain.v1.OAuth2ExchangeAuthorizationCodeRequest
+	(*OAuth2ExchangeAuthorizationCodeResponse)(nil),  // 12: brain.v1.OAuth2ExchangeAuthorizationCodeResponse
+	(*OAuth2RefreshAccessTokenRequest)(nil),          // 13: brain.v1.OAuth2RefreshAccessTokenRequest
+	(*OAuth2RefreshAccessTokenResponse)(nil),         // 14: brain.v1.OAuth2RefreshAccessTokenResponse
+	(*OAuth2RevokeAccessTokenRequest)(nil),           // 15: brain.v1.OAuth2RevokeAccessTokenRequest
+	(*OAuth2RevokeAccessTokenResponse)(nil),          // 16: brain.v1.OAuth2RevokeAccessTokenResponse
+	(*AgentSessionRequest_Agent)(nil),                // 17: brain.v1.AgentSessionRequest.Agent
+	(*AgentSessionRequest_TerminateExecution)(nil),   // 18: brain.v1.AgentSessionRequest.TerminateExecution
+	(*AgentSessionRequest_RunRequest)(nil),           // 19: brain.v1.AgentSessionRequest.RunRequest
+	(*AgentSessionRequest_ToolCallResponse)(nil),     // 20: brain.v1.AgentSessionRequest.ToolCallResponse
+	(*AgentSessionRequest_Heartbeat)(nil),            // 21: brain.v1.AgentSessionRequest.Heartbeat
+	(*AgentSessionRequest_SessionEnd)(nil),           // 22: brain.v1.AgentSessionRequest.SessionEnd
+	(*AgentSessionRequest_Agent_Tool)(nil),           // 23: brain.v1.AgentSessionRequest.Agent.Tool
+	(*AgentSessionResponse_Error)(nil),               // 24: brain.v1.AgentSessionResponse.Error
+	(*AgentSessionResponse_HeartbeatAck)(nil),        // 25: brain.v1.AgentSessionResponse.HeartbeatAck
+	(*AgentSessionResponse_SessionEndAck)(nil),       // 26: brain.v1.AgentSessionResponse.SessionEndAck
+	(*AgentSessionResponse_ToolCallRequest)(nil),     // 27: brain.v1.AgentSessionResponse.ToolCallRequest
+	(*AgentSessionResponse_RunResponse)(nil),         // 28: brain.v1.AgentSessionResponse.RunResponse
+	nil,                                              // 29: brain.v1.AgentSessionResponse.Error.DetailsEntry
+	(*v1.OAuth2Token)(nil),                           // 30: common.OAuth2Token
 }
 var file_brain_v1_server_proto_depIdxs = []int32{
-	11, // 0: brain.v1.AgentSessionRequest.run_request:type_name -> brain.v1.AgentSessionRequest.RunRequest
-	12, // 1: brain.v1.AgentSessionRequest.tool_call_response:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse
-	13, // 2: brain.v1.AgentSessionRequest.heartbeat:type_name -> brain.v1.AgentSessionRequest.Heartbeat
-	14, // 3: brain.v1.AgentSessionRequest.session_end:type_name -> brain.v1.AgentSessionRequest.SessionEnd
-	20, // 4: brain.v1.AgentSessionResponse.run_response:type_name -> brain.v1.AgentSessionResponse.RunResponse
-	19, // 5: brain.v1.AgentSessionResponse.tool_call_request:type_name -> brain.v1.AgentSessionResponse.ToolCallRequest
-	16, // 6: brain.v1.AgentSessionResponse.error:type_name -> brain.v1.AgentSessionResponse.Error
-	17, // 7: brain.v1.AgentSessionResponse.heartbeat_ack:type_name -> brain.v1.AgentSessionResponse.HeartbeatAck
-	18, // 8: brain.v1.AgentSessionResponse.session_end_ack:type_name -> brain.v1.AgentSessionResponse.SessionEndAck
-	15, // 9: brain.v1.AgentSessionRequest.Agent.tools:type_name -> brain.v1.AgentSessionRequest.Agent.Tool
-	9,  // 10: brain.v1.AgentSessionRequest.RunRequest.agents:type_name -> brain.v1.AgentSessionRequest.Agent
-	0,  // 11: brain.v1.AgentSessionRequest.ToolCallResponse.status:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse.Status
-	21, // 12: brain.v1.AgentSessionResponse.Error.details:type_name -> brain.v1.AgentSessionResponse.Error.DetailsEntry
-	1,  // 13: brain.v1.BrainService.DeviceHandshake:input_type -> brain.v1.DeviceHandshakeRequest
-	3,  // 14: brain.v1.BrainService.ClassifyApplication:input_type -> brain.v1.ClassifyApplicationRequest
-	5,  // 15: brain.v1.BrainService.ClassifyWebsite:input_type -> brain.v1.ClassifyWebsiteRequest
-	7,  // 16: brain.v1.BrainService.AgentSession:input_type -> brain.v1.AgentSessionRequest
-	2,  // 17: brain.v1.BrainService.DeviceHandshake:output_type -> brain.v1.DeviceHandshakeResponse
-	4,  // 18: brain.v1.BrainService.ClassifyApplication:output_type -> brain.v1.ClassifyApplicationResponse
-	6,  // 19: brain.v1.BrainService.ClassifyWebsite:output_type -> brain.v1.ClassifyWebsiteResponse
-	8,  // 20: brain.v1.BrainService.AgentSession:output_type -> brain.v1.AgentSessionResponse
-	17, // [17:21] is the sub-list for method output_type
-	13, // [13:17] is the sub-list for method input_type
-	13, // [13:13] is the sub-list for extension type_name
-	13, // [13:13] is the sub-list for extension extendee
-	0,  // [0:13] is the sub-list for field type_name
+	19, // 0: brain.v1.AgentSessionRequest.run_request:type_name -> brain.v1.AgentSessionRequest.RunRequest
+	20, // 1: brain.v1.AgentSessionRequest.tool_call_response:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse
+	21, // 2: brain.v1.AgentSessionRequest.heartbeat:type_name -> brain.v1.AgentSessionRequest.Heartbeat
+	22, // 3: brain.v1.AgentSessionRequest.session_end:type_name -> brain.v1.AgentSessionRequest.SessionEnd
+	28, // 4: brain.v1.AgentSessionResponse.run_response:type_name -> brain.v1.AgentSessionResponse.RunResponse
+	27, // 5: brain.v1.AgentSessionResponse.tool_call_request:type_name -> brain.v1.AgentSessionResponse.ToolCallRequest
+	24, // 6: brain.v1.AgentSessionResponse.error:type_name -> brain.v1.AgentSessionResponse.Error
+	25, // 7: brain.v1.AgentSessionResponse.heartbeat_ack:type_name -> brain.v1.AgentSessionResponse.HeartbeatAck
+	26, // 8: brain.v1.AgentSessionResponse.session_end_ack:type_name -> brain.v1.AgentSessionResponse.SessionEndAck
+	30, // 9: brain.v1.OAuth2ExchangeAuthorizationCodeResponse.token:type_name -> common.OAuth2Token
+	30, // 10: brain.v1.OAuth2RefreshAccessTokenResponse.token:type_name -> common.OAuth2Token
+	23, // 11: brain.v1.AgentSessionRequest.Agent.tools:type_name -> brain.v1.AgentSessionRequest.Agent.Tool
+	17, // 12: brain.v1.AgentSessionRequest.RunRequest.agents:type_name -> brain.v1.AgentSessionRequest.Agent
+	0,  // 13: brain.v1.AgentSessionRequest.ToolCallResponse.status:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse.Status
+	29, // 14: brain.v1.AgentSessionResponse.Error.details:type_name -> brain.v1.AgentSessionResponse.Error.DetailsEntry
+	1,  // 15: brain.v1.BrainService.DeviceHandshake:input_type -> brain.v1.DeviceHandshakeRequest
+	3,  // 16: brain.v1.BrainService.ClassifyApplication:input_type -> brain.v1.ClassifyApplicationRequest
+	5,  // 17: brain.v1.BrainService.ClassifyWebsite:input_type -> brain.v1.ClassifyWebsiteRequest
+	7,  // 18: brain.v1.BrainService.AgentSession:input_type -> brain.v1.AgentSessionRequest
+	9,  // 19: brain.v1.BrainService.OAuth2GetAuthorizationURL:input_type -> brain.v1.OAuth2GetAuthorizationURLRequest
+	11, // 20: brain.v1.BrainService.OAuth2ExchangeAuthorizationCode:input_type -> brain.v1.OAuth2ExchangeAuthorizationCodeRequest
+	13, // 21: brain.v1.BrainService.OAuth2RefreshAccessToken:input_type -> brain.v1.OAuth2RefreshAccessTokenRequest
+	15, // 22: brain.v1.BrainService.OAuth2RevokeAccessToken:input_type -> brain.v1.OAuth2RevokeAccessTokenRequest
+	2,  // 23: brain.v1.BrainService.DeviceHandshake:output_type -> brain.v1.DeviceHandshakeResponse
+	4,  // 24: brain.v1.BrainService.ClassifyApplication:output_type -> brain.v1.ClassifyApplicationResponse
+	6,  // 25: brain.v1.BrainService.ClassifyWebsite:output_type -> brain.v1.ClassifyWebsiteResponse
+	8,  // 26: brain.v1.BrainService.AgentSession:output_type -> brain.v1.AgentSessionResponse
+	10, // 27: brain.v1.BrainService.OAuth2GetAuthorizationURL:output_type -> brain.v1.OAuth2GetAuthorizationURLResponse
+	12, // 28: brain.v1.BrainService.OAuth2ExchangeAuthorizationCode:output_type -> brain.v1.OAuth2ExchangeAuthorizationCodeResponse
+	14, // 29: brain.v1.BrainService.OAuth2RefreshAccessToken:output_type -> brain.v1.OAuth2RefreshAccessTokenResponse
+	16, // 30: brain.v1.BrainService.OAuth2RevokeAccessToken:output_type -> brain.v1.OAuth2RevokeAccessTokenResponse
+	23, // [23:31] is the sub-list for method output_type
+	15, // [15:23] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_brain_v1_server_proto_init() }
@@ -1610,7 +2088,7 @@ func file_brain_v1_server_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_brain_v1_server_proto_rawDesc), len(file_brain_v1_server_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   21,
+			NumMessages:   29,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

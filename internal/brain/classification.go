@@ -19,7 +19,7 @@ import (
 	"gorm.io/gorm"
 
 	brainv1 "github.com/focusd-so/brain/gen/brain/v1"
-	"github.com/focusd-so/brain/gen/common"
+	commonv1 "github.com/focusd-so/brain/gen/common/v1"
 )
 
 // Cache TTL: 24 hours in seconds
@@ -655,7 +655,7 @@ func generateCacheKey(prompt string, contextData map[string]string) string {
 
 // getFromCache retrieves a cached response
 func (cs *ClassificationService) getFromCache(hash string) (string, error) {
-	var cache common.PromptHistoryORM
+	var cache commonv1.PromptHistoryORM
 	err := cs.db.Where("prompt_hash = ? AND expires_at > ?", hash, time.Now().Unix()).First(&cache).Error
 	if err != nil {
 		return "", err
@@ -666,7 +666,7 @@ func (cs *ClassificationService) getFromCache(hash string) (string, error) {
 // storeInCache stores a response in the cache
 func (cs *ClassificationService) storeInCache(hash, response string) error {
 	now := time.Now().Unix()
-	cache := common.PromptHistoryORM{
+	cache := commonv1.PromptHistoryORM{
 		PromptHash:   hash,
 		ResponseJson: response,
 		CreatedAt:    now,

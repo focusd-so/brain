@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package common;
 
-option go_package = "github.com/focusd-so/brain/gen/common/common;common";
+option go_package = "github.com/focusd-so/brain/gen/common/v1;commonv1";
 
 import "options/gorm.proto";
 
@@ -38,4 +38,15 @@ message PromptHistory {
     string response_json = 2 [(gorm.field).tag = {not_null: true, type: "TEXT"}];
     int64 created_at = 3 [(gorm.field).tag = {not_null: true}];
     int64 expires_at = 4 [(gorm.field).tag = {not_null: true}];
+}
+
+
+message OAuth2Token {
+    string access_token = 1;
+    string token_type = 2;        // "Bearer"
+    string refresh_token = 3;     // Empty if provider doesn't support rotation
+    int64 expiry_unix = 4;        // When the access token dies
+    
+    // Extra fields some providers send (e.g. Slack Team ID, GitHub User ID)
+    map<string, string> extra = 5; 
 }

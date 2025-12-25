@@ -25,19 +25,16 @@ import (
 )
 
 type AgentSession struct {
-	mu        *sync.Mutex
-	toolCalls map[string]chan *brainv1.AgentSessionRequest_ToolCallResponse
+	mu         *sync.Mutex
+	toolsQueue map[string]chan *brainv1.AgentSessionRequest_ToolCallResponse
 }
 
 func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStream[brainv1.AgentSessionRequest, brainv1.AgentSessionResponse]) error {
-	slog.Info("AgentSession: starting new session")
-
 	a := &AgentSession{
-		toolCalls: make(map[string]chan *brainv1.AgentSessionRequest_ToolCallResponse),
-		mu:        &sync.Mutex{},
+		toolsQueue: make(map[string]chan *brainv1.AgentSessionRequest_ToolCallResponse),
+		mu:         &sync.Mutex{},
 	}
 
-	slog.Info("AgentSession: waiting for initial message")
 	message, err := stream.Receive()
 	if err != nil {
 		slog.Error("AgentSession: failed to receive initial message", "error", err)
@@ -49,12 +46,6 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 		return fmt.Errorf("missing run request")
 	}
 
-	slog.Info("AgentSession: received run request",
-		"instruction", message.GetRunRequest().GetInstruction(),
-		"num_agents", len(message.GetRunRequest().GetAgents()),
-		"user_message", message.GetRunRequest().GetUserMessage())
-
-	slog.Info("AgentSession: creating Gemini model")
 	model, err := gemini.NewModel(ctx, "gemini-2.5-pro", &genai.ClientConfig{
 		APIKey: os.Getenv("FOCUSD_GEMINI_API_KEY"),
 	})
@@ -65,12 +56,7 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 
 	subAgents := []agent.Agent{}
 
-	slog.Info("AgentSession: constructing subagents")
-	// construct subagents
 	for _, agent := range message.GetRunRequest().GetAgents() {
-		slog.Info("AgentSession: processing agent",
-			"name", agent.GetName(),
-			"num_tools", len(agent.GetTools()))
 		cfg := llmagent.Config{
 			Model:       model,
 			Name:        agent.GetName(),
@@ -93,11 +79,9 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 				if inputSchema.Properties != nil && len(inputSchema.Properties) > 0 {
 					fntoolcfg.InputSchema = &inputSchema
 				} else {
-					// Set to empty schema - SDK requires InputSchema to be set, can't be nil
 					fntoolcfg.InputSchema = &jsonschema.Schema{}
 				}
 			} else {
-				// Set to empty schema - SDK requires InputSchema to be set, can't be nil
 				fntoolcfg.InputSchema = &jsonschema.Schema{}
 			}
 			if t.GetOutputSchema() != "" {
@@ -108,7 +92,6 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 				fntoolcfg.OutputSchema = &outputSchema
 			}
 
-			slog.Info("AgentSession: creating function tool", "tool_name", t.GetName())
 			fntool, err := functiontool.New(fntoolcfg, func(ctx tool.Context, input map[string]any) (map[string]any, error) {
 				inputJSON, err := json.Marshal(input)
 				if err != nil {
@@ -130,29 +113,20 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 					return nil, fmt.Errorf("failed to send tool call request: %w", err)
 				}
 
-				slog.Info("awaiting tool call response", "request_id", requestID)
-
-				// Create channel for this request
 				a.mu.Lock()
-				a.toolCalls[requestID] = make(chan *brainv1.AgentSessionRequest_ToolCallResponse, 1)
+				a.toolsQueue[requestID] = make(chan *brainv1.AgentSessionRequest_ToolCallResponse, 1)
 				a.mu.Unlock()
-
-				// Wait for tool call response from client with timeout
 				select {
-				case response := <-a.toolCalls[requestID]:
+				case response := <-a.toolsQueue[requestID]:
 					// Clean up the channel
 					a.mu.Lock()
-					delete(a.toolCalls, requestID)
+					delete(a.toolsQueue, requestID)
 					a.mu.Unlock()
 
 					if response == nil {
-						slog.Error("AgentSession: no tool call response received", "request_id", requestID)
 						return nil, fmt.Errorf("no tool call response received")
 					}
 
-					slog.Info("AgentSession: received tool call response", "request_id", requestID, "response", response.GetOutput())
-
-					// return jsonschema
 					var output map[string]any
 					if err := json.Unmarshal([]byte(response.GetOutput()), &output); err != nil {
 						return nil, fmt.Errorf("failed to unmarshal tool call response: %w", err)
@@ -162,7 +136,7 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 				case <-time.After(3 * time.Minute):
 					// Clean up the channel on timeout
 					a.mu.Lock()
-					delete(a.toolCalls, requestID)
+					delete(a.toolsQueue, requestID)
 					a.mu.Unlock()
 
 					slog.Error("AgentSession: tool call response timeout", "request_id", requestID)
@@ -176,10 +150,8 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 			cfg.Tools = append(cfg.Tools, fntool)
 		}
 
-		slog.Info("AgentSession: creating subagent", "name", agent.GetName())
 		subAgent, err := llmagent.New(cfg)
 		if err != nil {
-			slog.Error("AgentSession: failed to create subagent", "name", agent.GetName(), "error", err)
 			return err
 		}
 		subAgents = append(subAgents, subAgent)
@@ -187,7 +159,6 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 
 	slog.Info("AgentSession: all subagents created", "count", len(subAgents))
 
-	slog.Info("AgentSession: starting message receiver goroutine")
 	go func() {
 		for {
 			message, err := stream.Receive()
@@ -206,7 +177,7 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 
 				slog.Info("AgentSession: received tool call response",
 					"request_id", toolCallResponse.GetRequestId(), "response", toolCallResponse.GetOutput())
-				a.toolCalls[toolCallResponse.GetRequestId()] <- toolCallResponse
+				a.toolsQueue[toolCallResponse.GetRequestId()] <- toolCallResponse
 			case *brainv1.AgentSessionRequest_SessionEnd_:
 				slog.Info("AgentSession: session ended", "reason", message.GetSessionEnd().GetReason())
 				break

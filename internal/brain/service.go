@@ -17,7 +17,7 @@ import (
 
 	brainv1 "github.com/focusd-so/brain/gen/brain/v1"
 	"github.com/focusd-so/brain/gen/brain/v1/brainv1connect"
-	"github.com/focusd-so/brain/gen/common"
+	commonv1 "github.com/focusd-so/brain/gen/common/v1"
 	"github.com/focusd-so/brain/internal/auth"
 )
 
@@ -95,13 +95,13 @@ func (s *ServiceImpl) verifyHMAC(req *connect.Request[brainv1.DeviceHandshakeReq
 	}
 
 	// Replay Attack Check (Nonce)
-	if err := s.gormDB.Where("nonce = ?", nonce).First(&common.Nonce{}).Error; err != nil {
+	if err := s.gormDB.Where("nonce = ?", nonce).First(&commonv1.NonceORM{}).Error; err != nil {
 		if err != gorm.ErrRecordNotFound {
 			return fmt.Errorf("db error: %w", err)
 		}
 	}
 
-	if err := s.gormDB.Create(&common.Nonce{
+	if err := s.gormDB.Create(&commonv1.NonceORM{
 		Nonce:     nonce,
 		CreatedAt: now,
 		ExpiresAt: now + 30,
@@ -138,19 +138,19 @@ func (s *ServiceImpl) verifyHMAC(req *connect.Request[brainv1.DeviceHandshakeReq
 	return nil
 }
 
-func (s *ServiceImpl) upsertShadowUser(ctx context.Context, fingerprint string) (common.User, error) {
-	var user common.UserORM
+func (s *ServiceImpl) upsertShadowUser(ctx context.Context, fingerprint string) (commonv1.UserORM, error) {
+	var user commonv1.UserORM
 	err := s.gormDB.Where("device_fingerprint_hash = ?", fingerprint).First(&user).Error
 	if err == nil {
-		return user.ToPB(ctx)
+		return user, nil
 	}
 
 	if err != gorm.ErrRecordNotFound {
-		return common.User{}, err
+		return commonv1.UserORM{}, err
 	}
 
 	// Create new user
-	newUser := common.UserORM{
+	newUser := commonv1.UserORM{
 		DeviceFingerprintHash: fingerprint,
 		Role:                  "anonymous",
 		OsInfo:                "unknown", // TODO: Populate from request?
@@ -158,8 +158,8 @@ func (s *ServiceImpl) upsertShadowUser(ctx context.Context, fingerprint string) 
 	}
 
 	if err := s.gormDB.Create(&newUser).Error; err != nil {
-		return common.User{}, err
+		return commonv1.UserORM{}, err
 	}
 
-	return newUser.ToPB(ctx)
+	return newUser, nil
 }

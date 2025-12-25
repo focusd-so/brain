@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.10
 // 	protoc        (unknown)
-// source: common/common.proto
+// source: common/v1/common.proto
 
-package common
+package commonv1
 
 import (
 	_ "github.com/infobloxopen/protoc-gen-gorm/options"
@@ -35,7 +35,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_common_common_proto_msgTypes[0]
+	mi := &file_common_v1_common_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -47,7 +47,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[0]
+	mi := &file_common_v1_common_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -60,7 +60,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{0}
+	return file_common_v1_common_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *User) GetId() int64 {
@@ -109,7 +109,7 @@ type Nonce struct {
 
 func (x *Nonce) Reset() {
 	*x = Nonce{}
-	mi := &file_common_common_proto_msgTypes[1]
+	mi := &file_common_v1_common_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -121,7 +121,7 @@ func (x *Nonce) String() string {
 func (*Nonce) ProtoMessage() {}
 
 func (x *Nonce) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[1]
+	mi := &file_common_v1_common_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -134,7 +134,7 @@ func (x *Nonce) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Nonce.ProtoReflect.Descriptor instead.
 func (*Nonce) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{1}
+	return file_common_v1_common_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Nonce) GetNonce() string {
@@ -171,7 +171,7 @@ type PromptHistory struct {
 
 func (x *PromptHistory) Reset() {
 	*x = PromptHistory{}
-	mi := &file_common_common_proto_msgTypes[2]
+	mi := &file_common_v1_common_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -183,7 +183,7 @@ func (x *PromptHistory) String() string {
 func (*PromptHistory) ProtoMessage() {}
 
 func (x *PromptHistory) ProtoReflect() protoreflect.Message {
-	mi := &file_common_common_proto_msgTypes[2]
+	mi := &file_common_v1_common_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -196,7 +196,7 @@ func (x *PromptHistory) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PromptHistory.ProtoReflect.Descriptor instead.
 func (*PromptHistory) Descriptor() ([]byte, []int) {
-	return file_common_common_proto_rawDescGZIP(), []int{2}
+	return file_common_v1_common_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *PromptHistory) GetPromptHash() string {
@@ -227,11 +227,88 @@ func (x *PromptHistory) GetExpiresAt() int64 {
 	return 0
 }
 
-var File_common_common_proto protoreflect.FileDescriptor
+type OAuth2Token struct {
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken  string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	TokenType    string                 `protobuf:"bytes,2,opt,name=token_type,json=tokenType,proto3" json:"token_type,omitempty"`          // "Bearer"
+	RefreshToken string                 `protobuf:"bytes,3,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"` // Empty if provider doesn't support rotation
+	ExpiryUnix   int64                  `protobuf:"varint,4,opt,name=expiry_unix,json=expiryUnix,proto3" json:"expiry_unix,omitempty"`      // When the access token dies
+	// Extra fields some providers send (e.g. Slack Team ID, GitHub User ID)
+	Extra         map[string]string `protobuf:"bytes,5,rep,name=extra,proto3" json:"extra,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const file_common_common_proto_rawDesc = "" +
+func (x *OAuth2Token) Reset() {
+	*x = OAuth2Token{}
+	mi := &file_common_v1_common_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OAuth2Token) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OAuth2Token) ProtoMessage() {}
+
+func (x *OAuth2Token) ProtoReflect() protoreflect.Message {
+	mi := &file_common_v1_common_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OAuth2Token.ProtoReflect.Descriptor instead.
+func (*OAuth2Token) Descriptor() ([]byte, []int) {
+	return file_common_v1_common_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *OAuth2Token) GetAccessToken() string {
+	if x != nil {
+		return x.AccessToken
+	}
+	return ""
+}
+
+func (x *OAuth2Token) GetTokenType() string {
+	if x != nil {
+		return x.TokenType
+	}
+	return ""
+}
+
+func (x *OAuth2Token) GetRefreshToken() string {
+	if x != nil {
+		return x.RefreshToken
+	}
+	return ""
+}
+
+func (x *OAuth2Token) GetExpiryUnix() int64 {
+	if x != nil {
+		return x.ExpiryUnix
+	}
+	return 0
+}
+
+func (x *OAuth2Token) GetExtra() map[string]string {
+	if x != nil {
+		return x.Extra
+	}
+	return nil
+}
+
+var File_common_v1_common_proto protoreflect.FileDescriptor
+
+const file_common_v1_common_proto_rawDesc = "" +
 	"\n" +
-	"\x13common/common.proto\x12\x06common\x1a\x12options/gorm.proto\"\xd7\x01\n" +
+	"\x16common/v1/common.proto\x12\x06common\x1a\x12options/gorm.proto\"\xd7\x01\n" +
 	"\x04User\x12\x1a\n" +
 	"\x02id\x18\x01 \x01(\x03B\n" +
 	"\xba\xb9\x19\x06\n" +
@@ -265,54 +342,69 @@ const file_common_common_proto_rawDesc = "" +
 	"\x02@\x01R\tcreatedAt\x12'\n" +
 	"\n" +
 	"expires_at\x18\x04 \x01(\x03B\b\xba\xb9\x19\x04\n" +
-	"\x02@\x01R\texpiresAt:\x06\xba\xb9\x19\x02\b\x01B5Z3github.com/focusd-so/brain/gen/common/common;commonb\x06proto3"
+	"\x02@\x01R\texpiresAt:\x06\xba\xb9\x19\x02\b\x01\"\x85\x02\n" +
+	"\vOAuth2Token\x12!\n" +
+	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12\x1d\n" +
+	"\n" +
+	"token_type\x18\x02 \x01(\tR\ttokenType\x12#\n" +
+	"\rrefresh_token\x18\x03 \x01(\tR\frefreshToken\x12\x1f\n" +
+	"\vexpiry_unix\x18\x04 \x01(\x03R\n" +
+	"expiryUnix\x124\n" +
+	"\x05extra\x18\x05 \x03(\v2\x1e.common.OAuth2Token.ExtraEntryR\x05extra\x1a8\n" +
+	"\n" +
+	"ExtraEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B3Z1github.com/focusd-so/brain/gen/common/v1;commonv1b\x06proto3"
 
 var (
-	file_common_common_proto_rawDescOnce sync.Once
-	file_common_common_proto_rawDescData []byte
+	file_common_v1_common_proto_rawDescOnce sync.Once
+	file_common_v1_common_proto_rawDescData []byte
 )
 
-func file_common_common_proto_rawDescGZIP() []byte {
-	file_common_common_proto_rawDescOnce.Do(func() {
-		file_common_common_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_common_common_proto_rawDesc), len(file_common_common_proto_rawDesc)))
+func file_common_v1_common_proto_rawDescGZIP() []byte {
+	file_common_v1_common_proto_rawDescOnce.Do(func() {
+		file_common_v1_common_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_common_v1_common_proto_rawDesc), len(file_common_v1_common_proto_rawDesc)))
 	})
-	return file_common_common_proto_rawDescData
+	return file_common_v1_common_proto_rawDescData
 }
 
-var file_common_common_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_common_common_proto_goTypes = []any{
+var file_common_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_common_v1_common_proto_goTypes = []any{
 	(*User)(nil),          // 0: common.User
 	(*Nonce)(nil),         // 1: common.Nonce
 	(*PromptHistory)(nil), // 2: common.PromptHistory
+	(*OAuth2Token)(nil),   // 3: common.OAuth2Token
+	nil,                   // 4: common.OAuth2Token.ExtraEntry
 }
-var file_common_common_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+var file_common_v1_common_proto_depIdxs = []int32{
+	4, // 0: common.OAuth2Token.extra:type_name -> common.OAuth2Token.ExtraEntry
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_common_common_proto_init() }
-func file_common_common_proto_init() {
-	if File_common_common_proto != nil {
+func init() { file_common_v1_common_proto_init() }
+func file_common_v1_common_proto_init() {
+	if File_common_v1_common_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_common_proto_rawDesc), len(file_common_common_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_v1_common_proto_rawDesc), len(file_common_v1_common_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_common_common_proto_goTypes,
-		DependencyIndexes: file_common_common_proto_depIdxs,
-		MessageInfos:      file_common_common_proto_msgTypes,
+		GoTypes:           file_common_v1_common_proto_goTypes,
+		DependencyIndexes: file_common_v1_common_proto_depIdxs,
+		MessageInfos:      file_common_v1_common_proto_msgTypes,
 	}.Build()
-	File_common_common_proto = out.File
-	file_common_common_proto_goTypes = nil
-	file_common_common_proto_depIdxs = nil
+	File_common_v1_common_proto = out.File
+	file_common_v1_common_proto_goTypes = nil
+	file_common_v1_common_proto_depIdxs = nil
 }
