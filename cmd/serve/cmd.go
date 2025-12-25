@@ -34,10 +34,11 @@ var Command = &cli.Command{
 	Name: "serve",
 	Flags: []cli.Flag{
 		&cli.StringFlag{
-			Name:    "addr",
+			Name:    "port",
 			Value:   ":8089",
-			Usage:   "address to listen on",
+			Usage:   "port to listen on",
 			Aliases: []string{"p"},
+			Sources: cli.EnvVars("PORT"),
 		},
 		&cli.StringFlag{
 			Name:    "turso-db-url",
@@ -101,7 +102,7 @@ var Command = &cli.Command{
 		h2Handler := h2c.NewHandler(mux, &http2.Server{})
 
 		server := &http.Server{
-			Addr:    cmd.String("addr"),
+			Addr:    ":" + cmd.String("port"),
 			Handler: h2Handler, // Use the wrapped handler here
 			// ReadHeaderTimeout is recommended to prevent Slowloris attacks
 			ReadHeaderTimeout: 3 * time.Second,
@@ -111,7 +112,7 @@ var Command = &cli.Command{
 		signal.Notify(sigint, os.Interrupt)
 
 		go func() {
-			slog.Info("serving engine service", "addr", cmd.String("addr"))
+			slog.Info("serving engine service", "addr", ":"+cmd.String("port"))
 			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				slog.Error("failed to serve engine service", "error", err)
 				os.Exit(1)
