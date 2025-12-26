@@ -20,7 +20,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli/v3"
 
-	// 1. Add these imports for H2C support
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 
@@ -35,7 +34,7 @@ var Command = &cli.Command{
 	Flags: []cli.Flag{
 		&cli.StringFlag{
 			Name:    "port",
-			Value:   ":8089",
+			Value:   "8089",
 			Usage:   "port to listen on",
 			Aliases: []string{"p"},
 			Sources: cli.EnvVars("PORT"),

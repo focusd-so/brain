@@ -486,7 +486,10 @@ func NewClassificationService(db *gorm.DB) (*ClassificationService, error) {
 		apiKey = os.Getenv("GEMINI_API_KEY")
 	}
 	if apiKey == "" {
-		return nil, fmt.Errorf("GOOGLE_API_KEY or GEMINI_API_KEY environment variable not set")
+		apiKey = os.Getenv("FOCUSD_GEMINI_API_KEY")
+	}
+	if apiKey == "" {
+		return nil, fmt.Errorf("Gemini API key not found (tried GOOGLE_API_KEY, GEMINI_API_KEY, FOCUSD_GEMINI_API_KEY)")
 	}
 
 	client, err := genai.NewClient(ctx, &genai.ClientConfig{
@@ -632,7 +635,7 @@ func (cs *ClassificationService) callGemini(ctx context.Context, prompt string, 
 		return "", fmt.Errorf("failed to marshal context data: %w", err)
 	}
 
-	resp, err := cs.client.Models.GenerateContent(ctx, "gemini-2.5-flash", []*genai.Content{
+	resp, err := cs.client.Models.GenerateContent(ctx, "gemini-1.5-flash", []*genai.Content{
 		{
 			Role: "user",
 			Parts: []*genai.Part{

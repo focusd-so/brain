@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"log/slog"
 	"os"
 	"sync"
@@ -46,12 +45,26 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 		return fmt.Errorf("missing run request")
 	}
 
-	model, err := gemini.NewModel(ctx, "gemini-2.5-pro", &genai.ClientConfig{
-		APIKey: os.Getenv("FOCUSD_GEMINI_API_KEY"),
+	// Try GOOGLE_API_KEY first, then GEMINI_API_KEY, then FOCUSD_GEMINI_API_KEY
+	apiKey := os.Getenv("GOOGLE_API_KEY")
+	if apiKey == "" {
+		apiKey = os.Getenv("GEMINI_API_KEY")
+	}
+	if apiKey == "" {
+		apiKey = os.Getenv("FOCUSD_GEMINI_API_KEY")
+	}
+
+	if apiKey == "" {
+		slog.Error("AgentSession: no Gemini API key found")
+		return fmt.Errorf("no Gemini API key found (tried GOOGLE_API_KEY, GEMINI_API_KEY, FOCUSD_GEMINI_API_KEY)")
+	}
+
+	model, err := gemini.NewModel(ctx, "gemini-1.5-flash", &genai.ClientConfig{
+		APIKey: apiKey,
 	})
 	if err != nil {
 		slog.Error("AgentSession: failed to create model", "error", err)
-		log.Fatalf("Failed to create model: %v", err)
+		return fmt.Errorf("failed to create model: %w", err)
 	}
 
 	subAgents := []agent.Agent{}
@@ -72,7 +85,7 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 			if t.GetInputSchema() != "" {
 				var inputSchema jsonschema.Schema
 				if err := json.Unmarshal([]byte(t.GetInputSchema()), &inputSchema); err != nil {
-					log.Fatalf("Failed to unmarshal input schema: %v", err)
+					return fmt.Errorf("failed to unmarshal input schema: %w", err)
 				}
 				// Only set InputSchema if it has properties or is not just a bare object
 				// The Gemini SDK rejects bare {"type":"object"} with no properties
@@ -177,7 +190,16 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 
 				slog.Info("AgentSession: received tool call response",
 					"request_id", toolCallResponse.GetRequestId(), "response", toolCallResponse.GetOutput())
-				a.toolsQueue[toolCallResponse.GetRequestId()] <- toolCallResponse
+
+				a.mu.Lock()
+				ch, ok := a.toolsQueue[toolCallResponse.GetRequestId()]
+				a.mu.Unlock()
+
+				if ok {
+					ch <- toolCallResponse
+				} else {
+					slog.Warn("AgentSession: received response for unknown or timed-out tool call", "request_id", toolCallResponse.GetRequestId())
+				}
 			case *brainv1.AgentSessionRequest_SessionEnd_:
 				slog.Info("AgentSession: session ended", "reason", message.GetSessionEnd().GetReason())
 			}
