@@ -76,7 +76,7 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 				}
 				// Only set InputSchema if it has properties or is not just a bare object
 				// The Gemini SDK rejects bare {"type":"object"} with no properties
-				if inputSchema.Properties != nil && len(inputSchema.Properties) > 0 {
+				if len(inputSchema.Properties) > 0 {
 					fntoolcfg.InputSchema = &inputSchema
 				} else {
 					fntoolcfg.InputSchema = &jsonschema.Schema{}
@@ -180,7 +180,6 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 				a.toolsQueue[toolCallResponse.GetRequestId()] <- toolCallResponse
 			case *brainv1.AgentSessionRequest_SessionEnd_:
 				slog.Info("AgentSession: session ended", "reason", message.GetSessionEnd().GetReason())
-				break
 			}
 		}
 	}()

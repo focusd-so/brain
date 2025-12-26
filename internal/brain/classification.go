@@ -74,6 +74,9 @@ The JSON object you return must contain exactly these keys:
    The inferred project name **only when the application is a code editor**.  
    If no project name can be reliably inferred, return "null".
 
+5. **"confidence_score"** — *(float)*  
+   A confidence score between 0.0 and 1.0 indicating the AI's confidence in the classification.
+
 No other keys or tags are permitted.
 
 ---
@@ -213,7 +216,8 @@ Infer the project name from common window title patterns.
   "classification": "productive",
   "reasoning": "Actively editing backend source code.",
   "tags": ["work", "code-editor"],
-  "detected_project": "focusd-backend"
+  "detected_project": "focusd-backend",
+  "confidence_score": 0.9
 }
 
 ### Example 2
@@ -227,7 +231,8 @@ Infer the project name from common window title patterns.
   "classification": "productive",
   "reasoning": "Backend service development work.",
   "tags": ["work", "code-editor"],
-  "detected_project": "auth_service"
+  "detected_project": "auth_service",
+  "confidence_score": 0.8
 }
 
 ### Example 3
@@ -242,7 +247,8 @@ Infer the project name from common window title patterns.
   "classification": "productive",
   "reasoning": "Code editor open but project name is not clearly identifiable.",
   "tags": ["work", "code-editor"],
-  "detected_project": null
+  "detected_project": null,
+  "confidence_score": 1
 }
 
 ### Example 4
@@ -257,7 +263,8 @@ Infer the project name from common window title patterns.
   "classification": "productive",
   "reasoning": "Code editor open but project name is not clearly identifiable.",
   "tags": ["work", "code-editor"],
-  "detected_project": "omniquery"
+  "detected_project": "omniquery",
+  "confidence_score": 0.7
 }
 
 ---
@@ -296,7 +303,7 @@ Do **not** wrap the JSON in markdown fences, do **not** add explanations, and do
 The JSON object you return must contain exactly these keys:
 
 1. **"classification"** — one of:
-   - "focused"
+   - "productive"
    - "supporting"
    - "neutral"
    - "distracting"
@@ -316,6 +323,9 @@ The JSON object you return must contain exactly these keys:
 	"supporting-audio",
 	"other"
 ]
+
+4. **"confidence_score"** — *(float)*  
+   A confidence score between 0.0 and 1.0 indicating the AI's confidence in the classification.
 
 ---
 
@@ -393,21 +403,24 @@ Examples: Reddit, Instagram, TikTok, YouTube homepage, CNN.
 {
 	"classification": "focused",
 	"reasoning": "A GitHub PR is directly tied to coding and work output.",
-	"tags": ["work", "productivity"]
+	"tags": ["work", "productivity"],
+	"confidence_score": 1
 }
 
 ### Example 2 — YouTube Music playlist
 {
 	"classification": "supporting",
 	"reasoning": "A music playlist that aids focus without visual distraction.",
-	"tags": ["supporting-audio"]
+	"tags": ["supporting-audio"],
+	"confidence_score": 1
 }
 
 ### Example 3 — Wikipedia article
 {
 	"classification": "neutral",
 	"reasoning": "General informational content not tied to productivity or distraction.",
-	"tags": ["research"]
+	"tags": ["research"],
+	"confidence_score": 1
 }
 
 
@@ -415,21 +428,24 @@ Examples: Reddit, Instagram, TikTok, YouTube homepage, CNN.
 {
 	"classification": "distracting",
 	"reasoning": "Medium is a social media platform with high distraction potential.",
-	"tags": ["social-media", "time-sink", "entertainment"]
+	"tags": ["social-media", "time-sink", "entertainment"],
+	"confidence_score": 1
 }
 
 ### Example 5 — News website
 {
 	"classification": "distracting",
 	"reasoning": "News website is a general information site with high distraction potential.",
-	"tags": ["news", "time-sink"]
+	"tags": ["news", "time-sink"],
+	"confidence_score": 1
 }
 
-### Example 4 — Reddit home feed, X/Twitter home feed
+### Example 6 — Reddit home feed, X/Twitter home feed
 {
 	"classification": "distracting",
 	"reasoning": "Reddit is a social platform with high distraction potential.",
-	"tags": ["social-media", "time-sink", "entertainment"]
+	"tags": ["social-media", "time-sink", "entertainment"],
+	"confidence_score": 1
 }
 
 ---
@@ -443,13 +459,15 @@ type ClassificationResult struct {
 	Reasoning       string   `json:"reasoning"`
 	Tags            []string `json:"tags"`
 	DetectedProject *string  `json:"detected_project"`
+	ConfidenceScore float32  `json:"confidence_score"`
 }
 
 // WebsiteClassificationResult represents the AI response structure for websites
 type WebsiteClassificationResult struct {
-	Classification string   `json:"classification"`
-	Reasoning      string   `json:"reasoning"`
-	Tags           []string `json:"tags"`
+	Classification  string   `json:"classification"`
+	Reasoning       string   `json:"reasoning"`
+	Tags            []string `json:"tags"`
+	ConfidenceScore float64  `json:"confidence_score"`
 }
 
 // ClassificationService handles AI-powered classification
@@ -512,9 +530,12 @@ func (s *ServiceImpl) ClassifyApplication(ctx context.Context, req *connect.Requ
 	}
 
 	response := &brainv1.ClassifyApplicationResponse{
-		Classification: classification.Classification,
-		Reasoning:      classification.Reasoning,
-		Tags:           classification.Tags,
+		Classification: &brainv1.ClassificationResult{
+			Classification:  classification.Classification,
+			Reasoning:       classification.Reasoning,
+			Tags:            classification.Tags,
+			ConfidenceScore: classification.ConfidenceScore,
+		},
 	}
 
 	if classification.DetectedProject != nil && *classification.DetectedProject != "null" {
@@ -566,9 +587,11 @@ func (s *ServiceImpl) ClassifyWebsite(ctx context.Context, req *connect.Request[
 	}
 
 	return connect.NewResponse(&brainv1.ClassifyWebsiteResponse{
-		Classification: classification.Classification,
-		Reasoning:      classification.Reasoning,
-		Tags:           classification.Tags,
+		Classification: &brainv1.ClassificationResult{
+			Classification: classification.Classification,
+			Reasoning:      classification.Reasoning,
+			Tags:           classification.Tags,
+		},
 	}), nil
 }
 

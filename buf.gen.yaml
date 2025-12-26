@@ -11,3 +11,8 @@ plugins:
   - local: protoc-gen-gorm
     out: gen
     opt: paths=source_relative
+  - remote: buf.build/bufbuild/es
+    out: ../focusd-electron/apps/main/src/proto
+    include_imports: true
+    opt:
+      - target=ts
