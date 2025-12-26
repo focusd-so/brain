@@ -92,6 +92,10 @@ var Command = &cli.Command{
 				validate.NewInterceptor(),
 			),
 		)
+
+		protocols := new(http.Protocols)
+		protocols.SetHTTP1(true)
+		protocols.SetUnencryptedHTTP2(true)
 		mux.Handle(path, handler)
 
 		slog.Info("serving engine service at", "path", path)
@@ -105,6 +109,7 @@ var Command = &cli.Command{
 			Handler: h2Handler, // Use the wrapped handler here
 			// ReadHeaderTimeout is recommended to prevent Slowloris attacks
 			ReadHeaderTimeout: 3 * time.Second,
+			Protocols:         protocols,
 		}
 
 		sigint := make(chan os.Signal, 1)
