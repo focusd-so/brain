@@ -535,6 +535,7 @@ func (s *ServiceImpl) ClassifyApplication(ctx context.Context, req *connect.Requ
 			Reasoning:       classification.Reasoning,
 			Tags:            classification.Tags,
 			ConfidenceScore: classification.ConfidenceScore,
+			DetectedProject: classification.DetectedProject,
 		},
 	}
 
