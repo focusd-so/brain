@@ -41,7 +41,7 @@ var Command = &cli.Command{
 		},
 		&cli.StringFlag{
 			Name:    "turso-db-url",
-			Value:   "libsql://focusd-aram.aws-us-east-1.turso.io",
+			Value:   "",
 			Sources: cli.EnvVars("TURSO_CONNECTION_PATH"),
 		},
 		&cli.StringFlag{

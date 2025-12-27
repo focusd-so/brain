@@ -39,12 +39,12 @@ func (s *ServiceImpl) DeviceHandshake(ctx context.Context, req *connect.Request[
 	// and doesn't use the standard AuthInterceptor.
 	if err := s.verifyHMAC(req); err != nil {
 		slog.Error("failed to verify hmac", "error", err)
-		return nil, connect.NewError(connect.CodePermissionDenied, errors.New("signature verification failed"))
+		return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("signature verification failed: %w", err))
 	}
 
 	fingerprint := req.Msg.DeviceFingerprint
 	if fingerprint == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("fingerprint required"))
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("fingerprint required"))
 	}
 
 	// ---------------------------------------------------------
