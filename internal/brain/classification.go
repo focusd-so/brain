@@ -335,7 +335,7 @@ No other tags are permitted.
 
 ## Classification Rules
 
-### **focused**
+### **productive**
 Use this classification when the site directly supports work or skill development:
 - coding, PRs, documentation  
 - work dashboards or consoles  
@@ -369,7 +369,7 @@ Examples: Wikipedia article, Google search result page.
 ---
 
 ### **distracting**
-Use for sites that pull attention away from focused work:
+Use for sites that pull attention away from productive work:
 - social media feeds  
 - entertainment platforms  
 - general news  
@@ -401,7 +401,7 @@ Examples: Reddit, Instagram, TikTok, YouTube homepage, CNN.
 
 ### Example 1 — GitHub PR
 {
-	"classification": "focused",
+	"classification": "productive",
 	"reasoning": "A GitHub PR is directly tied to coding and work output.",
 	"tags": ["work", "productivity"],
 	"confidence_score": 1
