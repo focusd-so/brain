@@ -19,19 +19,19 @@ import (
 // ---------------------------------------------------------
 
 // KeyManager handles rotation. Keys are stored in env var:
-// FOCUSD_PASETO_KEYS="HEX_KEY_NEW,HEX_KEY_OLD"
+// PASETO_KEYS="HEX_KEY_NEW,HEX_KEY_OLD"
 type KeyManager struct{}
 
 func (km KeyManager) GetActiveKey() ([]byte, error) {
-	keys := strings.Split(os.Getenv("FOCUSD_PASETO_KEYS"), ",")
+	keys := strings.Split(os.Getenv("PASETO_KEYS"), ",")
 	if len(keys) == 0 || keys[0] == "" {
-		return nil, errors.New("FOCUSD_PASETO_KEYS not configured")
+		return nil, errors.New("PASETO_KEYS not configured")
 	}
 	return hex.DecodeString(strings.TrimSpace(keys[0]))
 }
 
 func (km KeyManager) GetAllKeys() ([][]byte, error) {
-	rawKeys := strings.Split(os.Getenv("FOCUSD_PASETO_KEYS"), ",")
+	rawKeys := strings.Split(os.Getenv("PASETO_KEYS"), ",")
 	var parsedKeys [][]byte
 
 	for _, k := range rawKeys {

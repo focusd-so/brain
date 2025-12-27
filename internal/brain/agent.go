@@ -47,7 +47,7 @@ func (s *ServiceImpl) AgentSession(ctx context.Context, stream *connect.BidiStre
 	}
 
 	model, err := gemini.NewModel(ctx, "gemini-2.5-pro", &genai.ClientConfig{
-		APIKey: os.Getenv("FOCUSD_GEMINI_API_KEY"),
+		APIKey: os.Getenv("GEMINI_API_KEY"),
 	})
 	if err != nil {
 		slog.Error("AgentSession: failed to create model", "error", err)

@@ -119,7 +119,7 @@ func (s *ServiceImpl) verifyHMAC(req *connect.Request[brainv1.DeviceHandshakeReq
 	payload := req.Msg.DeviceFingerprint + timestampStr + nonce
 
 	// 5. Calculate Expected Hash
-	secretStr := os.Getenv("FOCUSD_HMAC_SECRET_KEY")
+	secretStr := os.Getenv("HMAC_SECRET_KEY")
 	secret, err := hex.DecodeString(secretStr)
 	if err != nil {
 		slog.Error("failed to decode hmac secret", "error", err)
