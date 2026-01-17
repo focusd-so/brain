@@ -39,7 +39,7 @@ Do **not** wrap the JSON in markdown fences, do **not** add explanations, and do
 
 ---
 
-## JSON Schema (strict)
+# JSON Schema (strict)
 
 The JSON object you return must contain exactly these keys:
 
@@ -63,6 +63,7 @@ The JSON object you return must contain exactly these keys:
   "social-media",
   "entertainment",
   "news",
+  "music",
   "time-sink",
   "supporting-audio",
   "code-editor",
@@ -74,7 +75,10 @@ The JSON object you return must contain exactly these keys:
    The inferred project name **only when the application is a code editor**.  
    If no project name can be reliably inferred, return "null".
 
-5. **"confidence_score"** — *(float)*  
+5. **"detected_communication_channel"** — *(string | null)*  
+   The inferred communication channel name from title - like Slack, Teams or Discord.
+
+6. **"confidence_score"** — *(float)*  
    A confidence score between 0.0 and 1.0 indicating the AI's confidence in the classification.
 
 No other keys or tags are permitted.
@@ -172,6 +176,7 @@ Use when the app or window title indicates entertainment, social media, or atten
 - **supporting-audio** — music or ambient sound aiding focus
 - **code-editor** — IDEs and text editors used for coding
 - **design-tool** — Figma, Sketch, design software
+- **music** — music players, youtube playing music, spotify or apply music
 - **other** — fallback only when no tag applies
 
 ---
@@ -183,7 +188,7 @@ Populate **"detected_project"** **only when the application is a code editor**
 
 Infer the project name from common window title patterns.
 
-### Common patterns to detect:
+## Common patterns to detect:
 - "project-name — file.ext"
 - "project-name - file.ext"
 - "file.ext — project-name"
@@ -193,7 +198,7 @@ Infer the project name from common window title patterns.
 - "folder-name [SSH]"
 - "folder-name — Visual Studio Code"
 
-### Heuristics:
+## Heuristics:
 - Prefer **project/folder/workspace name** over file name
 - Strip file extensions
 - Ignore editor branding ("Visual Studio Code", "IntelliJ IDEA", etc.)
@@ -267,12 +272,64 @@ Infer the project name from common window title patterns.
   "confidence_score": 0.7
 }
 
+
+---
+
+# Communication Channel Detection Rules
+
+Populate **"detected_communication_channel"** **only when the application is a communication tool**
+(e.g., Slack, Discord, Teams).
+
+Infer the communication channel name from common window title patterns.
+
+### Common patterns to detect:
+- "#channel-name"
+- "channel-name"
+- "channel-name (Workspace)"
+- "channel-name [SSH]"
+- "channel-name — Slack"
+
+### Heuristics:
+- Prefer **channel name** over workspace name
+- Strip file extensions
+- Ignore editor branding ("Slack", "Discord", "Teams", etc.)
+
+### Examples:
+
+**Input**
+- name: "Slack"
+- title: "#incident-1234"
+- bundle_id: "com.tinyspeck.slackmacgap"
+
+**Output**
+{
+  "classification": "productive",
+  "reasoning": "Actively editing backend source code.",
+  "tags": ["work", "communication"],
+  "detected_communication_channel": "#incident-1234",
+  "confidence_score": 1
+}
+
+**Input**
+- name: "Slack"
+- title: "#fun-dogs"
+- bundle_id: "com.tinyspeck.slackmacgap"
+
+**Output**
+{
+  "classification": "distracting",
+  "reasoning": "Actively editing backend source code.",
+  "tags": ["content-consumption", "time-sink", "communication"],
+  "detected_communication_channel": "#fun-dogs",
+  "confidence_score": 1
+}
+
 ---
 
 # Contextual Interpretation Rules
 You must infer intent based on name + title + bundle_id.
 
-Slack Examples
+### Slack Examples
 Slack + #incident-1234 → productive (work, communication)
 
 Slack + #fun-dogs → distracting (social-media, entertainment)
@@ -307,13 +364,17 @@ The JSON object you return must contain exactly these keys:
    - "supporting"
    - "neutral"
    - "distracting"
+
 2. **"reasoning"** — a brief explanation for why you chose that classification.
+
 3. **"tags"** — an array containing one or more of the following strictly allowed tags:
 [
 	"work",
+	"code-editor",
 	"research",
 	"learning",
 	"communication",
+	"finance",
 	"productivity",
 	"content-consumption",
 	"social-media",
@@ -324,12 +385,17 @@ The JSON object you return must contain exactly these keys:
 	"other"
 ]
 
-4. **"confidence_score"** — *(float)*  
+4. **"detected_project"** — *(string | null)*  
+   The inferred project name **only when the website is a web-based code editor**.  
+   If no project name can be reliably inferred, return "null".
+
+5. **"detected_communication_channel"** — *(string | null)*  
+   The inferred communication channel name from title - like Slack, Teams or Discord.
+
+6. **"confidence_score"** — *(float)*  
    A confidence score between 0.0 and 1.0 indicating the AI's confidence in the classification.
 
----
-
-No other tags are permitted.
+No other keys or tags are permitted.
 
 ---
 
@@ -343,18 +409,27 @@ Use this classification when the site directly supports work or skill developmen
 - structured learning or tutorials  
 - productivity tools (Notion, Jira, Linear)
 
+**Web-based communication tool productive patterns:**
+- Slack channels like:
+  - "#incident-*"
+  - "#sev*"
+  - "#production-alerts"
+  - "#engineering", "#backend", "#frontend", "#devops"
+- Work-related DMs or threads
+- Any page containing: "PR", "review", "deployment", "on-call"
+
 Examples: GitHub PR, StackOverflow, MDN, AWS Console, Notion task board.
 
 ---
 
 ### **supporting**
 Use when the site helps maintain focus:
-- music players  
+- music players 
 - ambient noise  
 - lofi playlists  
 - audio-only pages intended to reduce distraction  
 
-Examples: Spotify playlist, YouTube Music, Brain.fm.
+Examples: Spotify playlist, YouTube Playing music, Brain.fm.
 
 ---
 
@@ -376,7 +451,17 @@ Use for sites that pull attention away from productive work:
 - algorithmic recommendation feeds  
 - meme sites, casual browsing
 
-Examples: Reddit, Instagram, TikTok, YouTube homepage, CNN.
+**Web-based communication tool distracting patterns:**
+- Slack channels like:
+  - "#fun-*"
+  - "#memes"
+  - "#dogs", "#cats"
+  - "#random"
+  - "#chit-chat"
+  - Any channel or page title containing:
+  - "fun", "lol", "meme", "offtopic", "social", "pets"
+
+Examples: Reddit, Instagram, TikTok, CNN.
 
 ---
 
@@ -393,58 +478,208 @@ Examples: Reddit, Instagram, TikTok, YouTube homepage, CNN.
 - **news** — general news sites  
 - **time-sink** — infinite scroll, high-distraction feeds  
 - **supporting-audio** — music or ambient sound used for focus  
+- **code-editor** — web-based IDEs and code editors
 - **other** — when none of the above meaningfully apply
 
 ---
 
-## Examples
+# Web-Based Code Editor Project Detection Rules
 
-### Example 1 — GitHub PR
+Populate **"detected_project"** **only when the website is a web-based code editor**
+(e.g., GitHub Codespaces, VS Code for Web, Replit, CodeSandbox, StackBlitz, Gitpod).
+
+Infer the project name from URL patterns and page titles.
+
+## Common patterns to detect:
+- URL paths containing project/repository names
+- Page titles like "project-name — file.ext"
+- Page titles like "project-name - file.ext"
+- Workspace or repository indicators in URL or title
+
+## Heuristics:
+- Prefer **project/folder/workspace/repository name** over file name
+- Strip file extensions
+- Ignore editor branding ("Codespaces", "Replit", etc.)
+- Ignore temporary labels like "•", "*", "modified"
+- If multiple candidates exist, choose the most stable workspace-level name
+- If no reliable project name is found, return "null"
+
+---
+
+## **Detected Project Examples**
+
+### Example 1
+**Input**
+- url: "https://github.dev/focusd-so/brain"
+- title: "brain/main.go at main · focusd-so/brain"
+
+**Output**
+{
+  "classification": "productive",
+  "reasoning": "Actively editing code in web-based editor.",
+  "tags": ["work", "code-editor"],
+  "detected_project": "brain",
+  "detected_communication_channel": null,
+  "confidence_score": 0.9
+}
+
+### Example 2
+**Input**
+- url: "https://codesandbox.io/s/auth-service-abc123"
+- title: "auth-service - CodeSandbox"
+
+**Output**
+{
+  "classification": "productive",
+  "reasoning": "Backend service development work.",
+  "tags": ["work", "code-editor"],
+  "detected_project": "auth-service",
+  "detected_communication_channel": null,
+  "confidence_score": 0.8
+}
+
+### Example 3
+**Input**
+- url: "https://replit.com/@username/MyProject"
+- title: "MyProject - Replit"
+
+**Output**
+{
+  "classification": "productive",
+  "reasoning": "Code editor open with identifiable project.",
+  "tags": ["work", "code-editor"],
+  "detected_project": "MyProject",
+  "detected_communication_channel": null,
+  "confidence_score": 0.85
+}
+
+---
+
+# Web Communication Channel Detection Rules
+
+Populate **"detected_communication_channel"** **only when the website is a communication tool**
+(e.g., Slack, Discord, Teams).
+
+Infer the communication channel name from URL patterns and page titles.
+
+### Common patterns to detect:
+- Page titles containing "#channel-name"
+- URL paths like "/messages/channel-name"
+- Channel indicators in title or URL
+
+### Heuristics:
+- Prefer **channel name** over workspace name
+- Include the "#" prefix for channels when detected
+- Ignore platform branding ("Slack", "Discord", "Teams", etc.)
+
+### Examples:
+
+### Example 4
+**Input**
+- url: "https://app.slack.com/client/T123/C456"
+- title: "#incident-1234 | Slack"
+
+**Output**
+{
+  "classification": "productive",
+  "reasoning": "Work-related incident channel in Slack.",
+  "tags": ["work", "communication"],
+  "detected_project": null,
+  "detected_communication_channel": "#incident-1234",
+  "confidence_score": 1
+}
+
+### Example 5
+**Input**
+- url: "https://discord.com/channels/123/456"
+- title: "#fun-dogs - Discord"
+
+**Output**
+{
+  "classification": "distracting",
+  "reasoning": "Non-work social channel in Discord.",
+  "tags": ["content-consumption", "time-sink", "communication"],
+  "detected_project": null,
+  "detected_communication_channel": "#fun-dogs",
+  "confidence_score": 1
+}
+
+### Example 6
+**Input**
+- url: "https://teams.microsoft.com/..."
+- title: "Engineering Team | Microsoft Teams"
+
+**Output**
+{
+  "classification": "productive",
+  "reasoning": "Work-related team communication.",
+  "tags": ["work", "communication"],
+  "detected_project": null,
+  "detected_communication_channel": "Engineering Team",
+  "confidence_score": 0.9
+}
+
+---
+
+## Additional Examples
+
+### Example 7 — GitHub PR
 {
 	"classification": "productive",
 	"reasoning": "A GitHub PR is directly tied to coding and work output.",
 	"tags": ["work", "productivity"],
+	"detected_project": null,
+	"detected_communication_channel": null,
 	"confidence_score": 1
 }
 
-### Example 2 — YouTube Music playlist
+### Example 8 — YouTube 
 {
 	"classification": "supporting",
 	"reasoning": "A music playlist that aids focus without visual distraction.",
 	"tags": ["supporting-audio"],
+	"detected_project": null,
+	"detected_communication_channel": null,
 	"confidence_score": 1
 }
 
-### Example 3 — Wikipedia article
+### Example 9 — Wikipedia article
 {
 	"classification": "neutral",
 	"reasoning": "General informational content not tied to productivity or distraction.",
 	"tags": ["research"],
+	"detected_project": null,
+	"detected_communication_channel": null,
 	"confidence_score": 1
 }
 
-
-### Example 4 — Medium article
+### Example 10 — Medium article
 {
 	"classification": "distracting",
 	"reasoning": "Medium is a social media platform with high distraction potential.",
 	"tags": ["social-media", "time-sink", "entertainment"],
+	"detected_project": null,
+	"detected_communication_channel": null,
 	"confidence_score": 1
 }
 
-### Example 5 — News website
+### Example 11 — News website
 {
 	"classification": "distracting",
 	"reasoning": "News website is a general information site with high distraction potential.",
 	"tags": ["news", "time-sink"],
+	"detected_project": null,
+	"detected_communication_channel": null,
 	"confidence_score": 1
 }
 
-### Example 6 — Reddit home feed, X/Twitter home feed
+### Example 12 — Reddit home feed, X/Twitter home feed
 {
 	"classification": "distracting",
 	"reasoning": "Reddit is a social platform with high distraction potential.",
 	"tags": ["social-media", "time-sink", "entertainment"],
+	"detected_project": null,
+	"detected_communication_channel": null,
 	"confidence_score": 1
 }
 
@@ -455,19 +690,22 @@ Use metadata, page title, and URL patterns to improve accuracy.
 
 // ClassificationResult represents the AI response structure for applications
 type ClassificationResult struct {
-	Classification  string   `json:"classification"`
-	Reasoning       string   `json:"reasoning"`
-	Tags            []string `json:"tags"`
-	DetectedProject *string  `json:"detected_project"`
-	ConfidenceScore float32  `json:"confidence_score"`
+	Classification               string   `json:"classification"`
+	Reasoning                    string   `json:"reasoning"`
+	Tags                         []string `json:"tags"`
+	DetectedProject              *string  `json:"detected_project"`
+	DetectedCommunicationChannel *string  `json:"detected_communication_channel"`
+	ConfidenceScore              float32  `json:"confidence_score"`
 }
 
 // WebsiteClassificationResult represents the AI response structure for websites
 type WebsiteClassificationResult struct {
-	Classification  string   `json:"classification"`
-	Reasoning       string   `json:"reasoning"`
-	Tags            []string `json:"tags"`
-	ConfidenceScore float64  `json:"confidence_score"`
+	Classification               string   `json:"classification"`
+	Reasoning                    string   `json:"reasoning"`
+	Tags                         []string `json:"tags"`
+	DetectedProject              *string  `json:"detected_project"`
+	DetectedCommunicationChannel *string  `json:"detected_communication_channel"`
+	ConfidenceScore              float64  `json:"confidence_score"`
 }
 
 // ClassificationService handles AI-powered classification
@@ -589,9 +827,12 @@ func (s *ServiceImpl) ClassifyWebsite(ctx context.Context, req *connect.Request[
 
 	return connect.NewResponse(&brainv1.ClassifyWebsiteResponse{
 		Classification: &brainv1.ClassificationResult{
-			Classification: classification.Classification,
-			Reasoning:      classification.Reasoning,
-			Tags:           classification.Tags,
+			Classification:               classification.Classification,
+			Reasoning:                    classification.Reasoning,
+			Tags:                         classification.Tags,
+			ConfidenceScore:              float32(classification.ConfidenceScore),
+			DetectedProject:              classification.DetectedProject,
+			DetectedCommunicationChannel: classification.DetectedCommunicationChannel,
 		},
 	}), nil
 }

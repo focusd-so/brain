@@ -213,14 +213,15 @@ func (x *DeviceHandshakeResponse) GetRemainingDailyScans() int32 {
 }
 
 type ClassificationResult struct {
-	state           protoimpl.MessageState `protogen:"open.v1"`
-	Classification  string                 `protobuf:"bytes,1,opt,name=classification,proto3" json:"classification,omitempty"` // "productive", "supporting", "neutral", "distracting"
-	Reasoning       string                 `protobuf:"bytes,2,opt,name=reasoning,proto3" json:"reasoning,omitempty"`
-	ConfidenceScore float32                `protobuf:"fixed32,3,opt,name=confidence_score,json=confidenceScore,proto3" json:"confidence_score,omitempty"` // 0.0 to 1.0 (How sure is the AI?)
-	Tags            []string               `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty"`
-	DetectedProject *string                `protobuf:"bytes,5,opt,name=detected_project,json=detectedProject,proto3,oneof" json:"detected_project,omitempty"` // e.g. "focusd" extracted from title
-	unknownFields   protoimpl.UnknownFields
-	sizeCache       protoimpl.SizeCache
+	state                        protoimpl.MessageState `protogen:"open.v1"`
+	Classification               string                 `protobuf:"bytes,1,opt,name=classification,proto3" json:"classification,omitempty"` // "productive", "supporting", "neutral", "distracting"
+	Reasoning                    string                 `protobuf:"bytes,2,opt,name=reasoning,proto3" json:"reasoning,omitempty"`
+	ConfidenceScore              float32                `protobuf:"fixed32,3,opt,name=confidence_score,json=confidenceScore,proto3" json:"confidence_score,omitempty"` // 0.0 to 1.0 (How sure is the AI?)
+	Tags                         []string               `protobuf:"bytes,4,rep,name=tags,proto3" json:"tags,omitempty"`
+	DetectedProject              *string                `protobuf:"bytes,5,opt,name=detected_project,json=detectedProject,proto3,oneof" json:"detected_project,omitempty"`                                          // e.g. "focusd" extracted from title
+	DetectedCommunicationChannel *string                `protobuf:"bytes,6,opt,name=detected_communication_channel,json=detectedCommunicationChannel,proto3,oneof" json:"detected_communication_channel,omitempty"` // e.g. "#incident-1234" from Slack/Discord/Teams
+	unknownFields                protoimpl.UnknownFields
+	sizeCache                    protoimpl.SizeCache
 }
 
 func (x *ClassificationResult) Reset() {
@@ -284,6 +285,13 @@ func (x *ClassificationResult) GetTags() []string {
 func (x *ClassificationResult) GetDetectedProject() string {
 	if x != nil && x.DetectedProject != nil {
 		return *x.DetectedProject
+	}
+	return ""
+}
+
+func (x *ClassificationResult) GetDetectedCommunicationChannel() string {
+	if x != nil && x.DetectedCommunicationChannel != nil {
+		return *x.DetectedCommunicationChannel
 	}
 	return ""
 }
@@ -1184,6 +1192,7 @@ type AgentSessionRequest_Agent struct {
 	Description   string                            `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	Instruction   string                            `protobuf:"bytes,3,opt,name=instruction,proto3" json:"instruction,omitempty"`
 	Tools         []*AgentSessionRequest_Agent_Tool `protobuf:"bytes,4,rep,name=tools,proto3" json:"tools,omitempty"`
+	SubAgents     []*AgentSessionRequest_Agent      `protobuf:"bytes,5,rep,name=sub_agents,json=subAgents,proto3" json:"sub_agents,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1242,6 +1251,13 @@ func (x *AgentSessionRequest_Agent) GetInstruction() string {
 func (x *AgentSessionRequest_Agent) GetTools() []*AgentSessionRequest_Agent_Tool {
 	if x != nil {
 		return x.Tools
+	}
+	return nil
+}
+
+func (x *AgentSessionRequest_Agent) GetSubAgents() []*AgentSessionRequest_Agent {
+	if x != nil {
+		return x.SubAgents
 	}
 	return nil
 }
@@ -1863,14 +1879,16 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\x02 \x01(\x03R\texpiresAt\x12!\n" +
 	"\faccount_role\x18\x03 \x01(\tR\vaccountRole\x122\n" +
-	"\x15remaining_daily_scans\x18\x04 \x01(\x05R\x13remainingDailyScans\"\xe0\x01\n" +
+	"\x15remaining_daily_scans\x18\x04 \x01(\x05R\x13remainingDailyScans\"\xce\x02\n" +
 	"\x14ClassificationResult\x12&\n" +
 	"\x0eclassification\x18\x01 \x01(\tR\x0eclassification\x12\x1c\n" +
 	"\treasoning\x18\x02 \x01(\tR\treasoning\x12)\n" +
 	"\x10confidence_score\x18\x03 \x01(\x02R\x0fconfidenceScore\x12\x12\n" +
 	"\x04tags\x18\x04 \x03(\tR\x04tags\x12.\n" +
-	"\x10detected_project\x18\x05 \x01(\tH\x00R\x0fdetectedProject\x88\x01\x01B\x13\n" +
-	"\x11_detected_project\"\x9e\x01\n" +
+	"\x10detected_project\x18\x05 \x01(\tH\x00R\x0fdetectedProject\x88\x01\x01\x12I\n" +
+	"\x1edetected_communication_channel\x18\x06 \x01(\tH\x01R\x1cdetectedCommunicationChannel\x88\x01\x01B\x13\n" +
+	"\x11_detected_projectB!\n" +
+	"\x1f_detected_communication_channel\"\x9e\x01\n" +
 	"\x1aClassifyApplicationRequest\x12)\n" +
 	"\x10application_name\x18\x01 \x01(\tR\x0fapplicationName\x122\n" +
 	"\x15application_bundle_id\x18\x02 \x01(\tR\x13applicationBundleId\x12!\n" +
@@ -1885,19 +1903,22 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\x03url\x18\x01 \x01(\tR\x03url\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\"a\n" +
 	"\x17ClassifyWebsiteResponse\x12F\n" +
-	"\x0eclassification\x18\x01 \x01(\v2\x1e.brain.v1.ClassificationResultR\x0eclassification\"\xd5\t\n" +
+	"\x0eclassification\x18\x01 \x01(\v2\x1e.brain.v1.ClassificationResultR\x0eclassification\"\x99\n" +
+	"\n" +
 	"\x13AgentSessionRequest\x12K\n" +
 	"\vrun_request\x18\x01 \x01(\v2(.brain.v1.AgentSessionRequest.RunRequestH\x00R\n" +
 	"runRequest\x12^\n" +
 	"\x12tool_call_response\x18\x02 \x01(\v2..brain.v1.AgentSessionRequest.ToolCallResponseH\x00R\x10toolCallResponse\x12G\n" +
 	"\theartbeat\x18\x03 \x01(\v2'.brain.v1.AgentSessionRequest.HeartbeatH\x00R\theartbeat\x12K\n" +
 	"\vsession_end\x18\x04 \x01(\v2(.brain.v1.AgentSessionRequest.SessionEndH\x00R\n" +
-	"sessionEnd\x1a\xa6\x02\n" +
+	"sessionEnd\x1a\xea\x02\n" +
 	"\x05Agent\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12 \n" +
 	"\vinstruction\x18\x03 \x01(\tR\vinstruction\x12>\n" +
-	"\x05tools\x18\x04 \x03(\v2(.brain.v1.AgentSessionRequest.Agent.ToolR\x05tools\x1a\x84\x01\n" +
+	"\x05tools\x18\x04 \x03(\v2(.brain.v1.AgentSessionRequest.Agent.ToolR\x05tools\x12B\n" +
+	"\n" +
+	"sub_agents\x18\x05 \x03(\v2#.brain.v1.AgentSessionRequest.AgentR\tsubAgents\x1a\x84\x01\n" +
 	"\x04Tool\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12!\n" +
@@ -2051,30 +2072,31 @@ var file_brain_v1_server_proto_depIdxs = []int32{
 	31, // 11: brain.v1.OAuth2ExchangeAuthorizationCodeResponse.token:type_name -> common.OAuth2Token
 	31, // 12: brain.v1.OAuth2RefreshAccessTokenResponse.token:type_name -> common.OAuth2Token
 	24, // 13: brain.v1.AgentSessionRequest.Agent.tools:type_name -> brain.v1.AgentSessionRequest.Agent.Tool
-	18, // 14: brain.v1.AgentSessionRequest.RunRequest.agents:type_name -> brain.v1.AgentSessionRequest.Agent
-	0,  // 15: brain.v1.AgentSessionRequest.ToolCallResponse.status:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse.Status
-	30, // 16: brain.v1.AgentSessionResponse.Error.details:type_name -> brain.v1.AgentSessionResponse.Error.DetailsEntry
-	1,  // 17: brain.v1.BrainService.DeviceHandshake:input_type -> brain.v1.DeviceHandshakeRequest
-	4,  // 18: brain.v1.BrainService.ClassifyApplication:input_type -> brain.v1.ClassifyApplicationRequest
-	6,  // 19: brain.v1.BrainService.ClassifyWebsite:input_type -> brain.v1.ClassifyWebsiteRequest
-	8,  // 20: brain.v1.BrainService.AgentSession:input_type -> brain.v1.AgentSessionRequest
-	10, // 21: brain.v1.BrainService.OAuth2GetAuthorizationURL:input_type -> brain.v1.OAuth2GetAuthorizationURLRequest
-	12, // 22: brain.v1.BrainService.OAuth2ExchangeAuthorizationCode:input_type -> brain.v1.OAuth2ExchangeAuthorizationCodeRequest
-	14, // 23: brain.v1.BrainService.OAuth2RefreshAccessToken:input_type -> brain.v1.OAuth2RefreshAccessTokenRequest
-	16, // 24: brain.v1.BrainService.OAuth2RevokeAccessToken:input_type -> brain.v1.OAuth2RevokeAccessTokenRequest
-	2,  // 25: brain.v1.BrainService.DeviceHandshake:output_type -> brain.v1.DeviceHandshakeResponse
-	5,  // 26: brain.v1.BrainService.ClassifyApplication:output_type -> brain.v1.ClassifyApplicationResponse
-	7,  // 27: brain.v1.BrainService.ClassifyWebsite:output_type -> brain.v1.ClassifyWebsiteResponse
-	9,  // 28: brain.v1.BrainService.AgentSession:output_type -> brain.v1.AgentSessionResponse
-	11, // 29: brain.v1.BrainService.OAuth2GetAuthorizationURL:output_type -> brain.v1.OAuth2GetAuthorizationURLResponse
-	13, // 30: brain.v1.BrainService.OAuth2ExchangeAuthorizationCode:output_type -> brain.v1.OAuth2ExchangeAuthorizationCodeResponse
-	15, // 31: brain.v1.BrainService.OAuth2RefreshAccessToken:output_type -> brain.v1.OAuth2RefreshAccessTokenResponse
-	17, // 32: brain.v1.BrainService.OAuth2RevokeAccessToken:output_type -> brain.v1.OAuth2RevokeAccessTokenResponse
-	25, // [25:33] is the sub-list for method output_type
-	17, // [17:25] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	18, // 14: brain.v1.AgentSessionRequest.Agent.sub_agents:type_name -> brain.v1.AgentSessionRequest.Agent
+	18, // 15: brain.v1.AgentSessionRequest.RunRequest.agents:type_name -> brain.v1.AgentSessionRequest.Agent
+	0,  // 16: brain.v1.AgentSessionRequest.ToolCallResponse.status:type_name -> brain.v1.AgentSessionRequest.ToolCallResponse.Status
+	30, // 17: brain.v1.AgentSessionResponse.Error.details:type_name -> brain.v1.AgentSessionResponse.Error.DetailsEntry
+	1,  // 18: brain.v1.BrainService.DeviceHandshake:input_type -> brain.v1.DeviceHandshakeRequest
+	4,  // 19: brain.v1.BrainService.ClassifyApplication:input_type -> brain.v1.ClassifyApplicationRequest
+	6,  // 20: brain.v1.BrainService.ClassifyWebsite:input_type -> brain.v1.ClassifyWebsiteRequest
+	8,  // 21: brain.v1.BrainService.AgentSession:input_type -> brain.v1.AgentSessionRequest
+	10, // 22: brain.v1.BrainService.OAuth2GetAuthorizationURL:input_type -> brain.v1.OAuth2GetAuthorizationURLRequest
+	12, // 23: brain.v1.BrainService.OAuth2ExchangeAuthorizationCode:input_type -> brain.v1.OAuth2ExchangeAuthorizationCodeRequest
+	14, // 24: brain.v1.BrainService.OAuth2RefreshAccessToken:input_type -> brain.v1.OAuth2RefreshAccessTokenRequest
+	16, // 25: brain.v1.BrainService.OAuth2RevokeAccessToken:input_type -> brain.v1.OAuth2RevokeAccessTokenRequest
+	2,  // 26: brain.v1.BrainService.DeviceHandshake:output_type -> brain.v1.DeviceHandshakeResponse
+	5,  // 27: brain.v1.BrainService.ClassifyApplication:output_type -> brain.v1.ClassifyApplicationResponse
+	7,  // 28: brain.v1.BrainService.ClassifyWebsite:output_type -> brain.v1.ClassifyWebsiteResponse
+	9,  // 29: brain.v1.BrainService.AgentSession:output_type -> brain.v1.AgentSessionResponse
+	11, // 30: brain.v1.BrainService.OAuth2GetAuthorizationURL:output_type -> brain.v1.OAuth2GetAuthorizationURLResponse
+	13, // 31: brain.v1.BrainService.OAuth2ExchangeAuthorizationCode:output_type -> brain.v1.OAuth2ExchangeAuthorizationCodeResponse
+	15, // 32: brain.v1.BrainService.OAuth2RefreshAccessToken:output_type -> brain.v1.OAuth2RefreshAccessTokenResponse
+	17, // 33: brain.v1.BrainService.OAuth2RevokeAccessToken:output_type -> brain.v1.OAuth2RevokeAccessTokenResponse
+	26, // [26:34] is the sub-list for method output_type
+	18, // [18:26] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_brain_v1_server_proto_init() }

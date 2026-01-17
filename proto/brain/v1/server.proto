@@ -68,6 +68,7 @@ message ClassificationResult {
     float confidence_score = 3;   // 0.0 to 1.0 (How sure is the AI?)
     repeated string tags = 4; 
     optional string detected_project = 5; // e.g. "focusd" extracted from title
+    optional string detected_communication_channel = 6; // e.g. "#incident-1234" from Slack/Discord/Teams
 }
 
 message ClassifyApplicationRequest {
@@ -112,6 +113,7 @@ message AgentSessionRequest {
         string description = 2;
         string instruction = 3;
         repeated Tool tools = 4;
+        repeated Agent sub_agents = 5;
     }
 
     message TerminateExecution {
