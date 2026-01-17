@@ -879,7 +879,7 @@ func (cs *ClassificationService) callGemini(ctx context.Context, prompt string, 
 		return "", fmt.Errorf("failed to marshal context data: %w", err)
 	}
 
-	resp, err := cs.client.Models.GenerateContent(ctx, "gemini-3-flesh-preview", []*genai.Content{
+	resp, err := cs.client.Models.GenerateContent(ctx, "gemini-2.5-flash", []*genai.Content{
 		{
 			Role: "user",
 			Parts: []*genai.Part{
