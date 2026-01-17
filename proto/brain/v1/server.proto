@@ -80,9 +80,11 @@ message ClassifyApplicationRequest {
 message ClassifyApplicationResponse {
     ClassificationResult classification = 1;
     
+    optional string detected_communication_channel = 2;
+
     // Metadata extraction (for Context correlation)
-    optional string detected_project = 6; // e.g. "focusd" extracted from title
-    optional string detected_file = 7;    // e.g. "main.go"
+    optional string detected_project = 3; // e.g. "focusd" extracted from title
+    optional string detected_file = 4;    // e.g. "main.go"
 }
 
 message ClassifyWebsiteRequest {

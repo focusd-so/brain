@@ -357,11 +357,12 @@ func (x *ClassifyApplicationRequest) GetWindowTitle() string {
 }
 
 type ClassifyApplicationResponse struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Classification *ClassificationResult  `protobuf:"bytes,1,opt,name=classification,proto3" json:"classification,omitempty"`
+	state                        protoimpl.MessageState `protogen:"open.v1"`
+	Classification               *ClassificationResult  `protobuf:"bytes,1,opt,name=classification,proto3" json:"classification,omitempty"`
+	DetectedCommunicationChannel *string                `protobuf:"bytes,2,opt,name=detected_communication_channel,json=detectedCommunicationChannel,proto3,oneof" json:"detected_communication_channel,omitempty"`
 	// Metadata extraction (for Context correlation)
-	DetectedProject *string `protobuf:"bytes,6,opt,name=detected_project,json=detectedProject,proto3,oneof" json:"detected_project,omitempty"` // e.g. "focusd" extracted from title
-	DetectedFile    *string `protobuf:"bytes,7,opt,name=detected_file,json=detectedFile,proto3,oneof" json:"detected_file,omitempty"`          // e.g. "main.go"
+	DetectedProject *string `protobuf:"bytes,3,opt,name=detected_project,json=detectedProject,proto3,oneof" json:"detected_project,omitempty"` // e.g. "focusd" extracted from title
+	DetectedFile    *string `protobuf:"bytes,4,opt,name=detected_file,json=detectedFile,proto3,oneof" json:"detected_file,omitempty"`          // e.g. "main.go"
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -401,6 +402,13 @@ func (x *ClassifyApplicationResponse) GetClassification() *ClassificationResult 
 		return x.Classification
 	}
 	return nil
+}
+
+func (x *ClassifyApplicationResponse) GetDetectedCommunicationChannel() string {
+	if x != nil && x.DetectedCommunicationChannel != nil {
+		return *x.DetectedCommunicationChannel
+	}
+	return ""
 }
 
 func (x *ClassifyApplicationResponse) GetDetectedProject() string {
@@ -1892,11 +1900,13 @@ const file_brain_v1_server_proto_rawDesc = "" +
 	"\x1aClassifyApplicationRequest\x12)\n" +
 	"\x10application_name\x18\x01 \x01(\tR\x0fapplicationName\x122\n" +
 	"\x15application_bundle_id\x18\x02 \x01(\tR\x13applicationBundleId\x12!\n" +
-	"\fwindow_title\x18\x03 \x01(\tR\vwindowTitle\"\xe6\x01\n" +
+	"\fwindow_title\x18\x03 \x01(\tR\vwindowTitle\"\xd4\x02\n" +
 	"\x1bClassifyApplicationResponse\x12F\n" +
-	"\x0eclassification\x18\x01 \x01(\v2\x1e.brain.v1.ClassificationResultR\x0eclassification\x12.\n" +
-	"\x10detected_project\x18\x06 \x01(\tH\x00R\x0fdetectedProject\x88\x01\x01\x12(\n" +
-	"\rdetected_file\x18\a \x01(\tH\x01R\fdetectedFile\x88\x01\x01B\x13\n" +
+	"\x0eclassification\x18\x01 \x01(\v2\x1e.brain.v1.ClassificationResultR\x0eclassification\x12I\n" +
+	"\x1edetected_communication_channel\x18\x02 \x01(\tH\x00R\x1cdetectedCommunicationChannel\x88\x01\x01\x12.\n" +
+	"\x10detected_project\x18\x03 \x01(\tH\x01R\x0fdetectedProject\x88\x01\x01\x12(\n" +
+	"\rdetected_file\x18\x04 \x01(\tH\x02R\fdetectedFile\x88\x01\x01B!\n" +
+	"\x1f_detected_communication_channelB\x13\n" +
 	"\x11_detected_projectB\x10\n" +
 	"\x0e_detected_file\"@\n" +
 	"\x16ClassifyWebsiteRequest\x12\x10\n" +

@@ -769,16 +769,21 @@ func (s *ServiceImpl) ClassifyApplication(ctx context.Context, req *connect.Requ
 
 	response := &brainv1.ClassifyApplicationResponse{
 		Classification: &brainv1.ClassificationResult{
-			Classification:  classification.Classification,
-			Reasoning:       classification.Reasoning,
-			Tags:            classification.Tags,
-			ConfidenceScore: classification.ConfidenceScore,
-			DetectedProject: classification.DetectedProject,
+			Classification:               classification.Classification,
+			Reasoning:                    classification.Reasoning,
+			Tags:                         classification.Tags,
+			ConfidenceScore:              classification.ConfidenceScore,
+			DetectedProject:              classification.DetectedProject,
+			DetectedCommunicationChannel: classification.DetectedCommunicationChannel,
 		},
 	}
 
-	if classification.DetectedProject != nil && *classification.DetectedProject != "null" {
+	if classification.DetectedProject != nil {
 		response.DetectedProject = classification.DetectedProject
+	}
+
+	if classification.DetectedCommunicationChannel != nil {
+		response.DetectedCommunicationChannel = classification.DetectedCommunicationChannel
 	}
 
 	return connect.NewResponse(response), nil
